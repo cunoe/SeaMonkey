@@ -4,8 +4,6 @@ export default defineNuxtConfig({
     head: {
       charset: 'utf-8',
       viewport: 'width=device-width,initial-scale=1',
-      title: 'CUNOE&DIARY',
-      meta: [{ name: 'description', content: 'CUNOE&DIARY' }],
     },
     pageTransition: { name: 'page', mode: 'out-in' },
     layoutTransition: { name: 'layout', mode: 'out-in' },
@@ -22,6 +20,18 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
+  vite: {
+    clearScreen: false,
+    envPrefix: ['VITE_', 'TAURI_'],
+    server: {
+      strictPort: true,
+      hmr: {
+        protocol: 'ws',
+        host: '0.0.0.0',
+        port: 5183,
+      },
+    },
+  },
 
   modules: [
     "@nuxt/content",

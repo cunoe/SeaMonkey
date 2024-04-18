@@ -11,7 +11,7 @@
         </div>
         <!-- 右侧头像部分 -->
         <div>
-          <img src="/favicon.ico" alt="Avatar" class="w-10 h-10 rounded-full"> <!-- 示例路径，请替换为实际的图片路径 -->
+          <nuxt-link to="https://github.com/cunoe" target="_blank" class="btn btn-ghost text-xl text-gray-400 hover:text-white"><img src="/favicon.ico" alt="Avatar" class="w-10 h-10 rounded-full"></nuxt-link>
         </div>
       </div>
     </div>
@@ -38,13 +38,3 @@
 <!--    </div>-->
   </div>
 </template>
-
-<script>
-
-
-
-</script>
-
-<style>
-/* 样式 */
-</style>

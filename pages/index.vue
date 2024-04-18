@@ -1,12 +1,9 @@
 <script setup>
-// const page = Number(path.replace('blog/', ''))
-// const limit = 10
-
 import { Command } from '@tauri-apps/api/shell'
 import convertShipId from "~/utils/convertShipId.ts";
-// alternatively, use `window.__TAURI__.shell.Command`
-// `binaries/my-sidecar` is the EXACT value specified on `tauri.conf.json > tauri > bundle > externalBin`
-// notice that the args array matches EXACTLY what is specified on `tauri.conf.json`.
+import parseDateTime from "~/utils/parseDateTime.ts";
+import convertSecondsToHMSString from "~/utils/convertSecondsToHMSString.ts";
+
 const output = ref()
 const date = ref()
 const maxItem = ref(0)
@@ -14,25 +11,7 @@ const duration = ref(0)
 const isReady = ref(false)
 const path = "D:\\Games\\World_of_Warships"
 
-function parseDateTime(dateTimeString) {
-  const [datePart, timePart] = dateTimeString.split(' ');
-  const [day, month, year] = datePart.split('.').map(Number);
-  const [hours, minutes, seconds] = timePart.split(':').map(Number);
-  return new Date(year, month - 1, day, hours, minutes, seconds);
-}
-
-function convertSecondsToHMSString(totalSeconds) {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  const formattedTime = `${hours.toString().padStart(2, '0')}小时${minutes.toString().padStart(2, '0')}分钟${seconds.toFixed().toString().padStart(2, '0')}秒`;
-
-  return formattedTime;
-}
-
-// 设置一个定时器 每秒执行一次并增加计数器
-const timer = setInterval(async () => {
+setInterval(async () => {
   const command = Command.sidecar('binaries/replay-parser', ["-p", path])
   command.execute().then(
       (res) => {
