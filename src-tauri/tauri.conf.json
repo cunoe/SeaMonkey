@@ -4,7 +4,7 @@
     "beforeBuildCommand": "pnpm generate",
     "beforeDevCommand": "pnpm dev",
     "devPath": "http://localhost:3000",
-    "distDir": "../.output/public"
+    "distDir": "../dist"
   },
   "package": {
     "productName": "sea-monkey",
@@ -12,7 +12,22 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": true,
+      "shell": {
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "binaries/replay-parser",
+            "sidecar": true,
+            "args": [
+              "-p",
+              {
+                "validator": "\\S+"
+              }
+            ]
+          }
+        ]
+      }
     },
     "bundle": {
       "active": true,
@@ -21,7 +36,9 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [],
+      "externalBin": [
+        "binaries/replay-parser"
+      ],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -56,10 +73,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 700,
         "resizable": true,
-        "title": "SeaMonkey",
-        "width": 800
+        "title": "SeaMonkey - 谁是海猴？",
+        "width": 1300
       }
     ]
   }

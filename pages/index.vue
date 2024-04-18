@@ -2,83 +2,136 @@
 // const page = Number(path.replace('blog/', ''))
 // const limit = 10
 
-// const articles = await queryContent('blogs').sort({date: -1}).skip((page-1)*limit).limit(limit).find()
-const articles = await queryContent('blog').where({ published: {$exists: false} }).sort({date:-1}).find()
-const convertDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+import { Command } from '@tauri-apps/api/shell'
+import convertShipId from "~/utils/convertShipId.ts";
+// alternatively, use `window.__TAURI__.shell.Command`
+// `binaries/my-sidecar` is the EXACT value specified on `tauri.conf.json > tauri > bundle > externalBin`
+// notice that the args array matches EXACTLY what is specified on `tauri.conf.json`.
+const output = ref()
+const date = ref()
+const maxItem = ref(0)
+const duration = ref(0)
+const isReady = ref(false)
+const path = "D:\\Games\\World_of_Warships"
+
+function parseDateTime(dateTimeString) {
+  const [datePart, timePart] = dateTimeString.split(' ');
+  const [day, month, year] = datePart.split('.').map(Number);
+  const [hours, minutes, seconds] = timePart.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes, seconds);
 }
 
-// function randomEmoji() {
-//   const emojiRanges = [
-//     [0x1F601, 0x1F64F], // 表情符号
-//     [0x1F680, 0x1F6C0], // 交通和地图符号
-//     [0x1F300, 0x1F5FF], // 杂项符号和象形文字
-//   ];
-//
-//   const [rangeStart, rangeEnd] = emojiRanges[Math.floor(Math.random() * emojiRanges.length)];
-//   const randomCodePoint = Math.floor(Math.random() * (rangeEnd - rangeStart + 1)) + rangeStart;
-//   return String.fromCodePoint(randomCodePoint);
-// }
-//
-// const emojiList = Array.from({ length: 30 }, randomEmoji);
+function convertSecondsToHMSString(totalSeconds) {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
 
-const emojiList = ['🐭', "😏","😐","😑","😒","😕", "😖","😗","😘","😙","😚","😛","😜","😝","😞","😟","😠","😡","😢",
-  "😣","😤","😥","😦","😧","😨","😩","😪","😫","😬","😭","😮","😯","😰","😱","😲","😳","😴","😵","😶","😷","😸","😹"
-  ,"😺","😻","😼","😽","😾","😿","🙀","🙁","🙂","🙃","🙄","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍","🙎","🙏","🚁"]
+  const formattedTime = `${hours.toString().padStart(2, '0')}小时${minutes.toString().padStart(2, '0')}分钟${seconds.toFixed().toString().padStart(2, '0')}秒`;
 
-import { ref } from 'vue'
-const items = ref(emojiList)
-function moveItem(toRemove) {
-  items.value = items.value.filter((item) => item !== toRemove)
-  if (Math.random() < 0.5) {
-    // 添加到开始
-    items.value.unshift(toRemove);
-  } else {
-    // 添加到结束
-    items.value.push(toRemove);
-  }
+  return formattedTime;
 }
 
+// 设置一个定时器 每秒执行一次并增加计数器
+const timer = setInterval(async () => {
+  const command = Command.sidecar('binaries/replay-parser', ["-p", path])
+  command.execute().then(
+      (res) => {
+        if (res !== "") {
+          let dataParse = JSON.parse(res.stdout)
+          if (dataParse?.dateTime !== date.value) {
+            isReady.value = true
+            output.value = dataParse
+            date.value = parseDateTime(dataParse.dateTime)
+            maxItem.value = Math.max(output.value?.vehicles.filter(item => item.relation !== 2).length, output.value?.vehicles.filter(item => item.relation === 2).length)
+          }
+        }
+      }
+  )
+  duration.value = date.value ? (new Date() - date.value) / 1000 : 0
+}, 1000)
 
-onMounted(() => {
-  document.title = 'CUNOE&DIARY'
-})
 </script>
 
 <template>
-  <div>
-    <swiper class="max-w-screen-md">
-      <ul v-auto-animate class="container flex flex-row text-2xl justify-center space-x-0.5">
-        <li
-            v-for="item in items"
-            :key="item"
-            @click="moveItem(item)"
-        >
-          {{ item }}
-        </li>
-      </ul>
-    </swiper>
+  <div v-if="!isReady">
     <div class="p-2" />
-    <div class="container mx-auto max-w-screen-md">
-      <div class="grid grid-cols-1 gap-4">
-        <div v-for="(article, index) in articles" :key="index">
-          <nuxt-link :to="`/blog/${article.urlname}`">
-            <div class="p-4 rounded-badge">
-              <h2 class="text-2xl font-bold mb-2">{{ article.title }}</h2>
-              <p class="my-4 text-gray-500">
-                by CUNOE, {{ convertDate(article.date) }}
-              </p>
-              <div class="prose prose-stone max-w-none">
-                {{ article.description }}
+     还没有数据哦~
+    <div class="p-2" />
+  </div>
+  <div v-if="isReady">
+    <div class="p-2" />
+    <div class="container max-w-full">
+      <div className="stats container">
+
+        <div className="stat text-center">
+          <div className="stat-figure text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div className="stat-title">游戏模式 GameMode</div>
+          <div className="stat-value">{{output?.matchGroup}}</div>
+<!--          <div className="stat-desc">Jan 1st - Feb 1st</div>-->
+        </div>
+
+        <div className="stat text-center">
+          <div className="stat-figure text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+          </div>
+          <div className="stat-title">对战地图 Map</div>
+          <div className="stat-value">{{output?.mapDisplayName}}</div>
+<!--          <div className="stat-desc">↗︎ 400 (22%)</div>-->
+        </div>
+
+        <div className="stat text-center">
+          <div className="stat-figure text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+          </div>
+          <div className="stat-title">游戏持续时间 Duration</div>
+          <div className="stat-value" v-if="duration < 300 * 20">{{ convertSecondsToHMSString(duration) }}</div>
+          <div className="stat-value" v-if="duration > 300 * 20">游戏似乎已经结束咯~</div>
+<!--          <div className="stat-desc">↘︎ 90 (14%)</div>-->
+        </div>
+
+      </div>
+      <div class="columns-2 p-4 gap-10">
+        <div>
+          <div v-for="(item, index) in output?.vehicles.filter(item => item.relation !== 2)" :key="index" class="rounded-lg p-1">
+            <div class="card bg-stone-500 text-primary-content">
+              <div class="card-body">
+                <h2 class="card-title">{{item.name}}</h2>
+                <p>{{ convertShipId(item.shipId.toString())?.ship_name?.zh_sg ?? '不认识这艘船捏' }}</p>
+                <!--              <div class="card-actions justify-end">-->
+                <!--                <button class="btn">Buy Now</button>-->
+                <!--              </div>-->
               </div>
             </div>
-          </nuxt-link>
-          <!-- 分割线 -->
-          <hr class="my-4 border-t border-gray-600 opacity-50">
+          </div>
+          <template v-if="output?.vehicles.filter(item => item.relation !== 2).length < maxItem">
+            <template v-for="i in maxItem - output?.vehicles.filter(item => item.relation !== 2).length">
+              <div class="rounded-lg p-4">
+                （空位）
+              </div>
+            </template>
+          </template>
+        </div>
+        <div>
+          <div v-for="(item, index) in output?.vehicles.filter(item => item.relation === 2)" :key="index" class="rounded-lg p-1">
+            <div class="card bg-stone-500 text-primary-content">
+              <div class="card-body">
+                <h2 class="card-title">{{item.name}}</h2>
+                <p>{{ convertShipId(item.shipId.toString())?.ship_name?.zh_sg ?? '不认识这艘船捏' }}</p>
+                <!--              <div class="card-actions justify-end">-->
+                <!--                <button class="btn">Buy Now</button>-->
+                <!--              </div>-->
+              </div>
+            </div>
+          </div>
+          <template v-if="output?.vehicles.filter(item => item.relation === 2).length < maxItem">
+            <template v-for="i in maxItem - output?.vehicles.filter(item => item.relation === 2).length">
+              <div class="rounded-lg p-4">
+                <div class="p-10"></div>
+              </div>
+            </template>
+          </template>
         </div>
       </div>
     </div>

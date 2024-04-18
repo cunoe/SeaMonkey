@@ -4,13 +4,13 @@
       <AppNavbar />
     </header>
     <main class="flex-1 flex flex-col justify-start m-4">
-      <div class="p-2"></div>
+<!--      <div class="p-2"></div>-->
       <slot />
-      <div class="p-2"></div>
+<!--      <div class="p-2"></div>-->
     </main>
-    <footer class="w-full">
-      <AppFooter />
-    </footer>
+<!--    <footer class="w-full">-->
+<!--      <AppFooter />-->
+<!--    </footer>-->
   </div>
 </template>
 
