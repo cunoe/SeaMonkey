@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"sort"
-	"sync"
+
 )
 
 func main() {

@@ -6,34 +6,62 @@ import parseDatetime from "~/utils/parse.datetime.ts";
 import convertSecondsToString from "~/utils/convert.seconds.to.string.ts";
 import convertMatchGroup from "../utils/convert.mathgroup.ts";
 import numberToRoman from "../utils/number.to.roman.ts";
+import {getKV} from "~/composables/store/kv.ts";
+import { SettingsNeededSettingsModal } from '#components';
 
+const modal = useModal()
 const output = ref()
 const date = ref()
 const maxItem = ref(0)
 const duration = ref(0)
 const isReady = ref(false)
-const path = "D:\\Games\\World_of_Warships"
+const gameDir = ref()
+const toast = useToast()
 
+function openNeededSettingsModal() {
+  toast.add({
+    title: "请正确设置游戏目录",
+    message: "请正确设置游戏目录",
+    type: "error",
+    duration: 3000,
+  })
+  modal.open(SettingsNeededSettingsModal, {
+    onSuccess: async () => {
+      gameDir.value = await getKV("gameDir")
+    }
+  })
+}
 
-useIntervalFn(async () => {
-  const command = Command.sidecar('binaries/replay-parser', ["-p", path])
-  command.execute().then(
-      (res) => {
-        if (res.stdout === "-1") {
+onBeforeMount(async () => {
+  gameDir.value = await getKV("gameDir")
+  if (gameDir.value === '') {
+    openNeededSettingsModal()
+  }
+});
 
-        } else if (res.stdout !== "") {
-          let dataParse = JSON.parse(res.stdout)
-          if (dataParse?.dateTime !== date.value) {
-            isReady.value = true
-            output.value = dataParse
-            date.value = parseDatetime(dataParse.dateTime)
-            maxItem.value = Math.max(output.value?.vehicles.filter(item => item.relation !== 2).length, output.value?.vehicles.filter(item => item.relation === 2).length)
+onMounted(async () => {
+  useIntervalFn(async () => {
+    const command = Command.sidecar('binaries/replay-parser', ["-p", gameDir.value])
+    command.execute().then(
+        (res) => {
+          if (res.stdout === "-1") {
+            openNeededSettingsModal()
+          } else if (res.stdout !== "") {
+            let dataParse = JSON.parse(res.stdout)
+            if (dataParse?.dateTime !== date.value) {
+              isReady.value = true
+              output.value = dataParse
+              date.value = parseDatetime(dataParse.dateTime)
+              maxItem.value = Math.max(output.value?.vehicles.filter(item => item.relation !== 2).length, output.value?.vehicles.filter(item => item.relation === 2).length)
+            }
           }
         }
-      }
-  )
-  duration.value = date.value ? (new Date() - date.value) / 1000 : 0
-}, 1000)
+    )
+  }, 5000)
+  useIntervalFn(async () => {
+    duration.value = date.value ? (new Date() - date.value) / 1000 : 0
+  }, 1000)
+})
 
 </script>
 
@@ -76,7 +104,7 @@ useIntervalFn(async () => {
         <div class="columns-2 p-4 gap-10">
           <div>
             <div v-for="(item, index) in output?.vehicles.filter(item => item.relation !== 2)" :key="index" class="rounded-lg p-1">
-              <div class="card bg-stone-500 text-primary-content">
+              <div class="card text-primary-content" style="background-color: #0fb4ff">
                 <div class="card-body">
                   <h2 class="card-title">{{item.name}}</h2>
                   <p>{{ convertShipid(item.shipId.toString())?.ship_name?.zh_sg ?? '不认识这艘船捏' }}</p>

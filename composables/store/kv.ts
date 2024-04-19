@@ -4,14 +4,14 @@ export interface KVData {
 }
 import Database from "tauri-plugin-sql-api";
 
-export async function getKV(key: string): Promise<KVData | null> {
+export async function getKV(key: string): Promise<string> {
   const db = await Database.load("sqlite:data.db");
   return db.select("SELECT * FROM properties WHERE key = ? LIMIT 1", [key]).then((res: any) => {
     console.log(res)
     if (res.length > 0) {
-      return res[0] as KVData;
+      return res[0].value
     } else {
-      return null;
+      return '';
     }
   });
 }
