@@ -32,14 +32,14 @@ jobs:
       - name: Sync node version and insatll nodejs
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 20.12.2
 
       # 使用 pnpm 作为包管理器
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         id: pnpm-install
         with:
-          version: 9
+          version: 9.0.2
           run_install: false
 
       - name: Get pnpm store directory
