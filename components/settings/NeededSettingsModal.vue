@@ -31,6 +31,9 @@ onBeforeMount(async () => {
   currentDir.value = await getKV('gameDir')
   currentServer.value = await getKV('gameServer')
   currentServerIndex.value = server.findIndex(item => item.id === currentServer.value)
+  if (currentServerIndex.value === -1) {
+    currentServerIndex.value = 0
+  }
   serverSelected.value = server[currentServerIndex.value]
 })
 
