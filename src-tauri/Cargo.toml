@@ -26,6 +26,6 @@ tauri = { version = "1.6.1", features = ["api-all"] }
 custom-protocol = [ "tauri/custom-protocol" ]
 
 [dependencies.tauri-plugin-sql]
-git = "ssh://git@ssh.github.com:443/tauri-apps/plugins-workspace.git"
+git = "https://github.com/tauri-apps/plugins-workspace"
 branch = "v1"
 features = ["sqlite"]
