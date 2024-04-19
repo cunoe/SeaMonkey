@@ -32,7 +32,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Utility",
       "copyright": "cunoe",
       "deb": {
         "depends": []
@@ -41,14 +41,11 @@
         "binaries/replay-parser"
       ],
       "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
+        "icons/sea-monkey.png",
         "icons/icon.ico"
       ],
       "identifier": "com.cunoe.sea-monkey",
-      "longDescription": "",
+      "longDescription": "一款战舰世界数据辅助工具",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -58,11 +55,15 @@
       },
       "resources": [],
       "shortDescription": "",
-      "targets": "all",
+      "targets": ["nsis", "updater"],
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "nsis": {
+          "languages": ["SimpChinese", "English"],
+          "displayLanguageSelector": true
+        }
       }
     },
     "security": {

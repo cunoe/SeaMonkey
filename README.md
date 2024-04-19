@@ -1,7 +1,7 @@
 # SeaMonkey 海猴指示器
 
 ## Run
-1. Download From [Releases](https://github.com/cunoe/sea-monkey/releases) 
+1. Download From [Releases](https://github.com/cunoe/SeaMonkey/releases) 
 2. Install and run
 
 ## Build
@@ -10,7 +10,7 @@
 3. Make tauri ready https://tauri.app/v1/guides/getting-started/prerequisites/#windows
 4. `make build-windows`
 
-## 数据目录
+## Data Path
 ```
 %APPDATA%\Roaming\com.cunoe.sea-monkey
 ```

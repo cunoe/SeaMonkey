@@ -11,7 +11,7 @@
         <div><nuxt-link to="/" class="btn btn-ghost text-3xl text-gray-400 hover:text-white">海猴雷达</nuxt-link></div>
         <!-- 右侧头像部分 -->
         <div>
-          <nuxt-link to="https://github.com/cunoe" target="_blank" class="btn btn-ghost text-xl text-gray-400 hover:text-white"><img src="/favicon.ico" alt="Avatar" class="w-10 h-10 rounded-full"></nuxt-link>
+          <nuxt-link to="https://github.com/cunoe/SeaMonkey" target="_blank" class="btn btn-ghost text-xl text-gray-400 hover:text-white"><img src="/favicon.ico" alt="Avatar" class="w-10 h-10 rounded-full"></nuxt-link>
         </div>
       </div>
     </div>
