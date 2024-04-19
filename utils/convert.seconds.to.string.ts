@@ -1,4 +1,4 @@
-export default function convertSecondsToHMSString(totalSeconds: number) {
+export default function convertSecondsToString(totalSeconds: number) {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;

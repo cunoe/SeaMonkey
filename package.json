@@ -10,13 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.8.1",
-    "@nuxt/content": "^2.12.1",
     "@nuxt/image": "^1.5.0",
     "@tauri-apps/api": "^1.5.3",
+    "@vueuse/core": "^10.9.0",
     "nuxt": "^3.11.1",
     "nuxt-icon": "^0.6.10",
-    "nuxt-swiper": "^1.2.2",
     "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

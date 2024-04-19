@@ -1,5 +1,5 @@
 
-export default function convertShipId(id: string): Ship {
+export default function convertShipid(id: string): Ship {
     return shipMap[id];
 }
 
