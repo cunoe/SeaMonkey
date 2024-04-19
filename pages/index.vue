@@ -3,6 +3,8 @@ import { Command } from '@tauri-apps/api/shell'
 import convertShipId from "~/utils/convertShipId.ts";
 import parseDateTime from "~/utils/parseDateTime.ts";
 import convertSecondsToHMSString from "~/utils/convertSecondsToHMSString.ts";
+import {getTokenByPhoneAndPassword} from "~/composables/requests/test.ts";
+import {getKV, saveKV} from "~/composables/store/kv.ts";
 
 const output = ref()
 const date = ref()
@@ -10,6 +12,9 @@ const maxItem = ref(0)
 const duration = ref(0)
 const isReady = ref(false)
 const path = "D:\\Games\\World_of_Warships"
+const token = ref()
+const timeNow = ref()
+
 
 setInterval(async () => {
   const command = Command.sidecar('binaries/replay-parser', ["-p", path])
@@ -78,9 +83,6 @@ setInterval(async () => {
               <div class="card-body">
                 <h2 class="card-title">{{item.name}}</h2>
                 <p>{{ convertShipId(item.shipId.toString())?.ship_name?.zh_sg ?? '不认识这艘船捏' }}</p>
-                <!--              <div class="card-actions justify-end">-->
-                <!--                <button class="btn">Buy Now</button>-->
-                <!--              </div>-->
               </div>
             </div>
           </div>
@@ -98,9 +100,6 @@ setInterval(async () => {
               <div class="card-body">
                 <h2 class="card-title">{{item.name}}</h2>
                 <p>{{ convertShipId(item.shipId.toString())?.ship_name?.zh_sg ?? '不认识这艘船捏' }}</p>
-                <!--              <div class="card-actions justify-end">-->
-                <!--                <button class="btn">Buy Now</button>-->
-                <!--              </div>-->
               </div>
             </div>
           </div>
