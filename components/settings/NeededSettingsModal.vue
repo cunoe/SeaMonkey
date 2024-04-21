@@ -1,41 +1,52 @@
 <script lang="ts" setup>
 import {getKV, saveKV} from "~/composables/store/kv";
+import isValidWindowsPath from "~/utils/valid.windows.path";
+import { open } from '@tauri-apps/api/dialog';
+import { appDir } from '@tauri-apps/api/path';
+// Open a selection dialog for directories
+async function selectDir() {
+  const selected = await open({
+    directory: true,
+    multiple: false,
+    defaultPath: await appDir(),
+  });
+  if (selected === null) {
+    // user cancelled the selection
+  } else {
+    dirInput.value = selected as string;
+  }
+}
 
-const toast = useToast()
-const modal = useModal()
 
-const emit = defineEmits(['success'])
 
-const currentDir: Ref<string> = ref('')
-const currentServer: Ref<string> = ref('')
-const currentServerIndex: Ref<number> = ref(0)
 interface Props {
   gameDir: string
   gameServer: string
 }
-const props = defineProps<Props>()
-function onSuccess() {
-  setSettings()
-  toast.add({
-    title: '设置成功',
-    message: '设置成功',
-    duration: 3000,
-  })
-  modal.close()
-  emit('success')
-}
 
-const dirInput: Ref<string> = ref('')
-
-onBeforeMount(async () => {
-  currentDir.value = await getKV('gameDir')
-  currentServer.value = await getKV('gameServer')
-  currentServerIndex.value = server.findIndex(item => item.id === currentServer.value)
-  if (currentServerIndex.value === -1) {
-    currentServerIndex.value = 0
+const server = [{
+  id: 'asia',
+  label: '亚服'
+},
+  {
+    id: 'na',
+    label: '美服'
+  },
+  {
+    id: 'eu',
+    label: '欧服'
   }
-  serverSelected.value = server[currentServerIndex.value]
-})
+]
+
+const toast = useToast()
+const modal = useModal()
+const emit = defineEmits(['success'])
+const currentDir: Ref<string> = ref('')
+const currentServer: Ref<string> = ref('')
+const currentServerIndex: Ref<number> = ref(0)
+const props = defineProps<Props>()
+const dirInput: Ref<string> = ref('')
+const serverSelected = ref(server[0])
 
 function setSettings() {
   console.log(dirInput.value)
@@ -47,24 +58,48 @@ function setSettings() {
   }
 }
 
-const server = [{
-    id: 'asia',
-    label: '亚服'
-  },
-  {
-    id: 'na',
-    label: '美服'
-  },
-  {
-    id: 'eu',
-    label: '欧服'
+function onSuccess() {
+  if (dirInput.value === '') {
+    toast.add({
+      title: '请选择游戏目录',
+      message: '请选择游戏目录',
+      duration: 3000,
+    })
+    return
   }
-]
-const serverSelected = ref(server[0])
+  if (!serverSelected.value.id) {
+    toast.add({
+      title: '请选择服务器',
+      message: '请选择服务器',
+      duration: 3000,
+    })
+    return
+  }
+  setSettings()
+  toast.add({
+    title: '设置成功',
+    message: '设置成功',
+    duration: 3000,
+  })
+  modal.close()
+  emit('success')
+}
+
+onBeforeMount(async () => {
+  currentDir.value = await getKV('gameDir')
+  currentServer.value = await getKV('gameServer')
+  currentServerIndex.value = server.findIndex(item => item.id === currentServer.value)
+  if (currentServerIndex.value === -1) {
+    currentServerIndex.value = 0
+  }
+  serverSelected.value = server[currentServerIndex.value]
+})
+
+
 </script>
 
 <template>
-  <UModal>
+  <UModal prevent-close>
     <UCard>
       <template #header>
         <div class="flex flex-row items-center justify-between">
@@ -74,8 +109,13 @@ const serverSelected = ref(server[0])
       <div class="space-y-4">
         <div class="w-full">
           <div class="text-xl text-gray-200">游戏目录</div>
-          <input type="tel" v-model="dirInput" :placeholder="currentDir ?? '未设置目录'"
-                 class="w-full input">
+          <div class="text-sm text-gray-400">类似 D:\Games\World_of_Warships</div>
+<!--          <input type="tel" v-model="dirInput" placeholder="如：D:\Games\World_of_Warships" class="w-full input">-->
+          <button class='btn' @click="selectDir">
+            选择目录
+          </button>
+          <div class="text-sm text-gray-400" v-if="currentDir!==''">当前目录：{{ currentDir }}</div>
+          <div class="text-sm text-gray-400" v-if="dirInput !==''">已选择目录：{{ dirInput }}</div>
         </div>
         <div class="w-full">
           <div class="text-xl text-gray-200">服务器</div>

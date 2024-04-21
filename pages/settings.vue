@@ -1,34 +1,131 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import {getKV, saveKV} from "~/composables/store/kv";
+import isValidWindowsPath from "~/utils/valid.windows.path";
 import { open } from '@tauri-apps/api/dialog';
 import { appDir } from '@tauri-apps/api/path';
 // Open a selection dialog for directories
-const selected = await open({
-  directory: true,
-  multiple: true,
-  defaultPath: await appDir(),
-});
-if (Array.isArray(selected)) {
-  // user selected multiple directories
-} else if (selected === null) {
-  // user cancelled the selection
-} else {
-  // user selected a single directory
+async function selectDir() {
+  const selected = await open({
+    directory: true,
+    multiple: false,
+    defaultPath: await appDir(),
+  });
+  if (selected === null) {
+    // user cancelled the selection
+  } else {
+    dirInput.value = selected as string;
+  }
 }
+
+
+
+interface Props {
+  gameDir: string
+  gameServer: string
+}
+
+const server = [{
+  id: 'asia',
+  label: '亚服'
+},
+  {
+    id: 'na',
+    label: '美服'
+  },
+  {
+    id: 'eu',
+    label: '欧服'
+  }
+]
+
+const toast = useToast()
+const modal = useModal()
+const emit = defineEmits(['success'])
+const currentDir: Ref<string> = ref('')
+const currentServer: Ref<string> = ref('')
+const currentServerIndex: Ref<number> = ref(0)
+const props = defineProps<Props>()
+const dirInput: Ref<string> = ref('')
+const serverSelected = ref(server[0])
+
+function changeDir() {
+  if (dirInput.value !== '') {
+    currentDir.value = dirInput.value
+    toast.add({
+      title: '目录修改成功',
+      message: '目录修改成功',
+      duration: 3000,
+    })
+  } else {
+    toast.add({
+      title: '目录格式错误',
+      message: '目录格式错误',
+      duration: 3000,
+    })
+  }
+  saveKV('gameDir', dirInput.value)
+}
+
+function changeServer() {
+  if (serverSelected.value.id) {
+    saveKV('gameServer', serverSelected.value.id)
+    toast.add({
+      title: '服务器修改成功',
+      message: '服务器修改成功',
+      duration: 3000,
+    })
+  }
+}
+
+onBeforeMount(async () => {
+  currentDir.value = await getKV('gameDir')
+  currentServer.value = await getKV('gameServer')
+  currentServerIndex.value = server.findIndex(item => item.id === currentServer.value)
+  if (currentServerIndex.value === -1) {
+    currentServerIndex.value = 0
+  }
+  serverSelected.value = server[currentServerIndex.value]
+})
+
+
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen">
-    <label class="form-control w-full max-w-xs">
-      <div class="label">
-        <span class="label-text text-xl">游戏目录</span>
-        <span class="label-text-alt">务必设置</span>
+  <div>
+    <div class="container mx-auto max-w-screen-md">
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <div class="w-full">
+            <div class="text-xl text-gray-200 join">游戏目录</div>
+            <div class="text-sm text-gray-400">  类似 D:\Games\World_of_Warships</div>
+            <!--          <input type="tel" v-model="dirInput" placeholder="如：D:\Games\World_of_Warships" class="w-full input">-->
+            <button class='btn' @click="selectDir">
+              选择目录
+            </button>
+            <div class="text-sm text-gray-400" v-if="currentDir!==''">当前目录：{{ currentDir }}</div>
+            <div class="text-sm text-gray-400" v-if="dirInput !==''">已选择目录：{{ dirInput }}</div>
+          </div>
+          <button class='btn' @click="changeDir">
+            保存
+          </button>
+          <!-- 分割线 -->
+          <hr class="my-4 border-t border-gray-600 opacity-50">
+          <div class="space-y-4">
+            <div class="w-full">
+              <div class="text-xl text-gray-200">服务器</div>
+            </div>
+            <USelectMenu  v-model="serverSelected" :options="server"></USelectMenu>
+          </div>
+          <button class='btn' @click="changeServer">
+            保存
+          </button>
+          <hr class="my-4 border-t border-gray-600 opacity-50">
+          <div class="">
+
+          </div>
+        </div>
       </div>
-      <input type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" />
-      <div class="label">
-        <span class="label-text-alt">Bottom Left label</span>
-        <span class="label-text-alt">Bottom Right label</span>
-      </div>
-    </label>
+    </div>
   </div>
 </template>
 
