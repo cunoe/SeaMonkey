@@ -19,7 +19,7 @@ const props = defineProps<{
       <template v-if="teammates.length < maxItem">
         <template v-for="i in maxItem - teammates.length">
           <div class="rounded-lg p-4">
-            <div class="p-10"></div>
+            <div class="p-12"></div>
           </div>
         </template>
       </template>
@@ -31,7 +31,7 @@ const props = defineProps<{
       <template v-if="enemies.length < maxItem">
         <template v-for="i in maxItem - enemies.length">
           <div class="rounded-lg p-4">
-            <div class="p-10"></div>
+            <div class="p-12"></div>
           </div>
         </template>
       </template>

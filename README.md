@@ -12,5 +12,5 @@
 
 ## Data Path
 ```
-%APPDATA%\Roaming\com.cunoe.sea-monkey
+%APPDATA%\com.cunoe.sea-monkey
 ```
