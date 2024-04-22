@@ -1,27 +1,19 @@
 <script lang="ts" setup>
 import {getKV, saveKV} from "~/composables/store/kv";
-import isValidWindowsPath from "~/utils/valid.windows.path";
 import { open } from '@tauri-apps/api/dialog';
-import { appDir } from '@tauri-apps/api/path';
-// Open a selection dialog for directories
+import { desktopDir } from '@tauri-apps/api/path';
+
 async function selectDir() {
   const selected = await open({
     directory: true,
     multiple: false,
-    defaultPath: await appDir(),
+    defaultPath: await desktopDir(),
   });
   if (selected === null) {
     // user cancelled the selection
   } else {
     dirInput.value = selected as string;
   }
-}
-
-
-
-interface Props {
-  gameDir: string
-  gameServer: string
 }
 
 const server = [{
@@ -39,12 +31,9 @@ const server = [{
 ]
 
 const toast = useToast()
-const modal = useModal()
-const emit = defineEmits(['success'])
 const currentDir: Ref<string> = ref('')
 const currentServer: Ref<string> = ref('')
 const currentServerIndex: Ref<number> = ref(0)
-const props = defineProps<Props>()
 const dirInput: Ref<string> = ref('')
 const serverSelected = ref(server[0])
 
@@ -53,14 +42,10 @@ function changeDir() {
     currentDir.value = dirInput.value
     toast.add({
       title: '目录修改成功',
-      message: '目录修改成功',
-      duration: 3000,
     })
   } else {
     toast.add({
       title: '目录格式错误',
-      message: '目录格式错误',
-      duration: 3000,
     })
   }
   saveKV('gameDir', dirInput.value)
@@ -71,8 +56,6 @@ function changeServer() {
     saveKV('gameServer', serverSelected.value.id)
     toast.add({
       title: '服务器修改成功',
-      message: '服务器修改成功',
-      duration: 3000,
     })
   }
 }

@@ -1,22 +1,13 @@
-<script setup>
-
+<script setup lang="ts">
 import TeammateCard from "~/components/player/TeammateCard.vue";
 import EnemyCard from "~/components/player/EnemyCard.vue";
+import type {Vehicle} from "~/types/GameData";
 
-const props = defineProps({
-  teammates: {
-    type: Array,
-    default: () => []
-  },
-  enemies: {
-    type: Array,
-    default: () => []
-  },
-  maxItem: {
-    type: Number,
-    default: 12
-  },
-})
+const props = defineProps<{
+  teammates: Array<Vehicle>,
+  enemies: Array<Vehicle>,
+  maxItem: number;
+}>();
 </script>
 
 <template>

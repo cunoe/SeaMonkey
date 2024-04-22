@@ -1,3 +1,5 @@
+import type {ShipInfo} from "~/utils/convert.shipid";
+
 export interface WeatherParams {
     [index: number]: string[];
 }
@@ -7,6 +9,7 @@ export interface Vehicle {
     relation: number;
     id: number;
     name: string;
+    shipInfo: ShipInfo;
 }
 
 export interface GameData {

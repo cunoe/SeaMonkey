@@ -1,4 +1,4 @@
-import type {Ship} from "~/utils/convert.shipid";
+import type {ShipInfo} from "~/utils/convert.shipid";
 
 export default function convertMapId(id: number): MapInfo {
     return mapIdMap[id] || {

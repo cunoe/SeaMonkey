@@ -1,10 +1,9 @@
-<script setup>
-const props = defineProps({
-  playerInfo : {
-    type: Object,
-    required: true
-  }
-})
+<script setup lang="ts">
+import type {GameData, Vehicle} from '~/types/GameData';
+
+const props = defineProps<{
+  playerInfo: Vehicle
+}>();
 </script>
 
 <template>

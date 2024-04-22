@@ -15,27 +15,6 @@
         </div>
       </div>
     </div>
-
-
-<!--    <div class="bg-auto h-64 relative bg-center" style="background-image: url(https://s3.cunoe.com/files/background/bg-3.jpg)">-->
-<!--      <div class="absolute bottom-0 left-0 right-0 bg-opacity-50 text-white py-4 px-6">-->
-<!--        <div class="container mx-auto">-->
-<!--          <nuxt-link to="/" class="text-white text-3xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">-->
-<!--            <strong>CUNOE&DIARY</strong>-->
-<!--          </nuxt-link>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-
-<!--    <div class="bg-base-300">-->
-<!--      <div class="container mx-auto text-3xl p-2">-->
-<!--        &lt;!&ndash; 添加 flex 和 justify-end 类来实现靠右对齐 &ndash;&gt;-->
-<!--        <div class="flex justify-end flex-1 space-x-4 text-gray-400">-->
-<!--          <nuxt-link to="mailto:admin@cunoe.com" class=""><Icon name="ic:baseline-mail-outline" class="hover:text-white"/></nuxt-link>-->
-<!--          <nuxt-link to="https://github.com/cunoe" target="_blank"><Icon name="uil:github" class="hover:text-white" /></nuxt-link>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
   </div>
 </template>
 <script setup lang="ts">

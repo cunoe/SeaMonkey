@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import {getKV, saveKV} from "~/composables/store/kv";
-import isValidWindowsPath from "~/utils/valid.windows.path";
 import { open } from '@tauri-apps/api/dialog';
-import { appDir } from '@tauri-apps/api/path';
-// Open a selection dialog for directories
+import { desktopDir } from '@tauri-apps/api/path';
+
 async function selectDir() {
   const selected = await open({
     directory: true,
     multiple: false,
-    defaultPath: await appDir(),
+    defaultPath: await desktopDir(),
   });
   if (selected === null) {
     // user cancelled the selection
@@ -17,7 +16,12 @@ async function selectDir() {
   }
 }
 
-
+const props = defineProps({
+  un: {
+    type: Number,
+    default: 12
+  },
+})
 
 interface Props {
   gameDir: string
@@ -44,7 +48,6 @@ const emit = defineEmits(['success'])
 const currentDir: Ref<string> = ref('')
 const currentServer: Ref<string> = ref('')
 const currentServerIndex: Ref<number> = ref(0)
-const props = defineProps<Props>()
 const dirInput: Ref<string> = ref('')
 const serverSelected = ref(server[0])
 
@@ -62,24 +65,18 @@ function onSuccess() {
   if (dirInput.value === '') {
     toast.add({
       title: '请选择游戏目录',
-      message: '请选择游戏目录',
-      duration: 3000,
     })
     return
   }
   if (!serverSelected.value.id) {
     toast.add({
       title: '请选择服务器',
-      message: '请选择服务器',
-      duration: 3000,
     })
     return
   }
   setSettings()
   toast.add({
     title: '设置成功',
-    message: '设置成功',
-    duration: 3000,
   })
   modal.close()
   emit('success')

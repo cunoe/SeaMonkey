@@ -1,38 +1,45 @@
-<script setup>
+<script lang="ts" setup>
 import { Command } from '@tauri-apps/api/shell'
 import { useIntervalFn } from '@vueuse/core'
-import convertShipid from "~/utils/convert.shipid.ts";
-import parseDatetime from "~/utils/parse.datetime.ts";
-import convertSecondsToString from "~/utils/convert.seconds.to.string.ts";
-import convertMatchGroup from "../utils/convert.mathgroup.ts";
-import numberToRoman from "../utils/number.to.roman.ts";
-import {getKV} from "~/composables/store/kv.ts";
+import { getKV } from "~/composables/store/kv";
+
+import convertShipid from "~/utils/convert.shipid";
+import parseDatetime from "~/utils/parse.datetime";
+
+import Players from "~/components/player/Players.vue";
+import GameStats from "~/components/player/GameStats.vue";
 import { SettingsNeededSettingsModal } from '#components';
-import isValidWindowsPath from "~/utils/valid.windows.path.ts";
-import TeammateCard from "~/components/player/TeammateCard.vue";
-import Players from "~/components/player/players.vue";
+
+import type {Ref} from "vue";
+import type {GameData, Vehicle} from "~/types/GameData";
+import {sortShip} from "#imports";
 
 const modal = useModal()
-const output = ref()
-const date = ref()
+const toast = useToast()
+
+const output: Ref<GameData> = ref(null as unknown as GameData)
+const date: Ref<Date> = ref(new Date())
 const dateTime = ref('')
 const maxItem = ref(0)
 const duration = ref(0)
 const isReady = ref(false)
-const gameDir = ref()
-const toast = useToast()
-const playersInfo = ref([])
-const player = ref({})
-const teammates = ref([])
-const enemies = ref([])
+const gameDir = ref('')
+const playersInfo: Ref<Vehicle[]> = ref([])
+const player: Ref<Vehicle> = ref(null as unknown as Vehicle)
+const teammates: Ref<Vehicle[]> = ref([])
+const enemies: Ref<Vehicle[]> = ref([])
+const checkModal = ref(false)
 
 function openNeededSettingsModal() {
   toast.add({
     title: "请正确设置游戏目录"
   })
+  checkModal.value = true
   modal.open(SettingsNeededSettingsModal, {
+    un: 1,
     onSuccess: async () => {
       gameDir.value = await getKV("gameDir")
+      checkModal.value = false
     }
   })
 }
@@ -45,8 +52,9 @@ onBeforeMount(async () => {
 });
 
 onMounted(async () => {
+  // 定期检测游戏目录 replays 下面的战斗信息
   useIntervalFn(async () => {
-    if (!isValidWindowsPath(gameDir.value)) {openNeededSettingsModal()}
+    if (checkModal.value) {return}
     const command = Command.sidecar('binaries/replay-parser', ["-p", gameDir.value])
     command.execute().then(
         (res) => {
@@ -65,16 +73,18 @@ onMounted(async () => {
               // 队友信息解析
               playersInfo.value = output.value?.vehicles.map(item => {
                 // 使用 convert 函数获取船舶信息
-                const shipInfo = convertShipid(item.shipId);
+                const shipInfo = convertShipid(String(item.shipId));
                 // 将船舶信息添加到当前车辆对象中
                 return {
                   ...item, // 保留原有的车辆信息
                   shipInfo: shipInfo // 添加船舶信息
                 };
               });
-              player.value = playersInfo.value.find(item => item.relation === 0)
+              player.value = <Vehicle>playersInfo.value.find(item => item.relation === 0)
               teammates.value = playersInfo.value.filter(item => item.relation !== 2)
               enemies.value = playersInfo.value.filter(item => item.relation === 2)
+              teammates.value = sortShip(teammates.value)
+              enemies.value = sortShip(enemies.value)
 
               // 计算本场游戏中的最大人数
               maxItem.value = Math.max(teammates.value.length, enemies.value.length)
@@ -85,7 +95,7 @@ onMounted(async () => {
     )
   }, 5000)
   useIntervalFn(async () => {
-    duration.value = date.value ? (new Date() - date.value) / 1000 : 0
+    duration.value = ((new Date).getTime() - date.value.getTime())/1000
   }, 1000)
 })
 
@@ -101,30 +111,8 @@ onMounted(async () => {
     <div v-if="isReady">
       <div class="p-2" />
         <div class="container max-w-full">
-          <div class="flex justify-center">
-            <div class="stats container">
-              <div class="stat text-center">
-                <div class="stat-title">游戏模式 GameMode</div>
-                <div class="stat-value">{{convertMatchGroup(output?.matchGroup)}} {{output?.name}}</div>
-              </div>
-              <div class="stat text-center">
-                <div class="stat-title">对战地图 Map</div>
-                <div class="stat-value">{{convertMapid(output?.mapId).name}}</div>
-              </div>
-              <div class="stat text-center">
-                <div class="stat-title">距离这一场战斗 Since</div>
-                <div class="stat-value">{{ convertSecondsToString(duration) }}</div>
-              </div>
-              <div class="stat text-center">
-                <div class="stat-title">你开的船 Ship</div>
-                <div class="stat-value">
-                  {{ player.shipInfo ? numberToRoman(player.shipInfo.tier) : '' }}
-                  {{ player.shipInfo ? player.shipInfo.ship_name.zh_sg : '不认识这艘船捏' }}
-                </div>
-              </div>
-            </div>
-          </div>
-          <players :teammates="teammates" :enemies="enemies" :maxItem="maxItem" />
+          <GameStats :duration="duration" :gameData="output" :player="player" />
+          <Players :teammates="teammates" :enemies="enemies" :maxItem="maxItem" />
       </div>
     </div>
   </div>
