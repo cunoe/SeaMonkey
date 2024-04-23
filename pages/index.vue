@@ -14,6 +14,7 @@ import type {Ref} from "vue";
 import type {GameData, Vehicle} from "~/types/GameData";
 import {sortShip} from "#imports";
 import {saveBattleHistory} from "~/composables/store/battle_history";
+import convertMatchGroup from "~/utils/convert.matchgroup";
 
 const modal = useModal()
 const toast = useToast()
@@ -88,7 +89,7 @@ onMounted(async () => {
               saveBattleHistory({
                 kokomi_battle_id: 0,
                 start_time: date.value,
-                match_group: output.value.matchGroup,
+                match_group: convertMatchGroup(output.value.matchGroup).name,
                 game_mode: output.value.gameMode,
                 map_display_name: convertMapid(output.value.mapId).name,
                 map_id: output.value.mapId,
