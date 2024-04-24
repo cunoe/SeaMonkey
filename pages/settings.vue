@@ -16,10 +16,34 @@ async function selectDir() {
   }
 }
 
-const server = [{
-  id: 'asia',
-  label: '亚服'
-},
+const server = [
+  {
+    id: 'auto',
+    label: '自动检测'
+  },
+  {
+    id: 'asia',
+    label: '亚服'
+  },
+  {
+    id: 'na',
+    label: '美服'
+  },
+  {
+    id: 'eu',
+    label: '欧服'
+  }
+]
+
+const clanEnemyServer = [
+  {
+    id: 'sync',
+    label: '与当前服务器相同'
+  },
+  {
+    id: 'asia',
+    label: '亚服'
+  },
   {
     id: 'na',
     label: '美服'
@@ -34,8 +58,12 @@ const toast = useToast()
 const currentDir: Ref<string> = ref('')
 const currentServer: Ref<string> = ref('')
 const currentServerIndex: Ref<number> = ref(0)
+const currentClanEnemyServer: Ref<string> = ref('')
+const currentClanEnemyServerIndex: Ref<number> = ref(0)
+
 const dirInput: Ref<string> = ref('')
 const serverSelected = ref(server[0])
+const clanEnemyServerSelected = ref(clanEnemyServer[0])
 
 function changeDir() {
   if (dirInput.value !== '') {
@@ -60,6 +88,15 @@ function changeServer() {
   }
 }
 
+function changeClanEnemyServer() {
+  if (clanEnemyServerSelected.value.id) {
+    saveKV('clanEnemyServer', clanEnemyServerSelected.value.id)
+    toast.add({
+      title: '服务器修改成功',
+    })
+  }
+}
+
 onBeforeMount(async () => {
   currentDir.value = await getKV('gameDir')
   currentServer.value = await getKV('gameServer')
@@ -68,6 +105,16 @@ onBeforeMount(async () => {
     currentServerIndex.value = 0
   }
   serverSelected.value = server[currentServerIndex.value]
+  currentClanEnemyServer.value = await getKV('clanEnemyServer')
+  if (currentClanEnemyServer.value === '') {
+    currentClanEnemyServer.value = 'sync'
+    await saveKV('clanEnemyServer', 'sync')
+  }
+  currentClanEnemyServerIndex.value = clanEnemyServer.findIndex(item => item.id === currentClanEnemyServer.value)
+  if (currentClanEnemyServerIndex.value === -1) {
+    currentClanEnemyServerIndex.value = 0
+  }
+  clanEnemyServerSelected.value = clanEnemyServer[currentClanEnemyServerIndex.value]
 })
 
 
@@ -96,6 +143,7 @@ onBeforeMount(async () => {
           <div class="space-y-4">
             <div class="w-full">
               <div class="text-xl text-gray-200">服务器</div>
+              <div class="text-sm text-gray-400">*服务器的设定将会影响到战绩统计，务必在启动游戏前确定服务器是否正确</div>
             </div>
             <USelectMenu  v-model="serverSelected" :options="server"></USelectMenu>
           </div>
@@ -103,9 +151,16 @@ onBeforeMount(async () => {
             保存
           </button>
           <hr class="my-4 border-t border-gray-600 opacity-50">
-          <div class="">
-
+          <div class="space-y-4">
+            <div class="w-full">
+              <div class="text-xl text-gray-200">军团战对方服务器</div>
+            </div>
+            <USelectMenu  v-model="clanEnemyServerSelected" :options="clanEnemyServer"></USelectMenu>
           </div>
+          <button class='btn' @click="changeClanEnemyServer">
+            保存
+          </button>
+          <hr class="my-4 border-t border-gray-600 opacity-50">
         </div>
       </div>
     </div>

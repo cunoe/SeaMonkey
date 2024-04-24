@@ -29,6 +29,10 @@ interface Props {
 }
 
 const server = [{
+  id: 'auto',
+  label: '自动检测'
+},
+  {
   id: 'asia',
   label: '亚服'
 },
@@ -50,14 +54,17 @@ const currentServer: Ref<string> = ref('')
 const currentServerIndex: Ref<number> = ref(0)
 const dirInput: Ref<string> = ref('')
 const serverSelected = ref(server[0])
+const currentClanEnemyServer = ref('')
 
 function setSettings() {
-  console.log(dirInput.value)
   if (dirInput.value) {
     saveKV('gameDir', dirInput.value)
   }
   if (serverSelected.value.id) {
     saveKV('gameServer', serverSelected.value.id)
+  }
+  if (currentClanEnemyServer.value === ''){
+    saveKV('clanEnemyServer', 'sync')
   }
 }
 
@@ -90,6 +97,7 @@ onBeforeMount(async () => {
     currentServerIndex.value = 0
   }
   serverSelected.value = server[currentServerIndex.value]
+  currentClanEnemyServer.value = await getKV('clanEnemyServer')
 })
 
 

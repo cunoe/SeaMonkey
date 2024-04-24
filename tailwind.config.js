@@ -27,7 +27,12 @@ export default {
         '5xl': '3.052rem',
       },
     },
-    extend: {},
+    extend: {
+        spacing: {
+          '128': '28rem',
+          '144': '30rem',
+        }
+    },
   },
   plugins: [
     require("daisyui"),

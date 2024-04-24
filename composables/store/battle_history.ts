@@ -1,5 +1,6 @@
 export interface BattleHistory {
     id: number;
+    timestamp: number;
     start_time: Date;
     kokomi_battle_id: number;
     match_group: string;
@@ -34,15 +35,14 @@ export async function saveBattleHistory(battleHistory: {
     kokomi_battle_id: number;
     raw_data: string;
     teams_count: number;
+    timestamp: number;
 }): Promise<number> {
     const db = await Database.load("sqlite:data.db");
-
     // 先查询是否存在相同 start_time 的记录
     const existingRecord: any = await db.select(`
-        SELECT id FROM battle_history WHERE start_time = $1;
-    `, [battleHistory.start_time]);
-
-    // 如果存在相同 start_time 的记录，则更新其他字段
+        SELECT id FROM battle_history WHERE timestamp = $1;
+    `, [battleHistory.timestamp]);
+    // 如果存在相同 timestamp 的记录，则更新其他字段
     if (existingRecord.length > 0) {
         return db.execute(`
             UPDATE battle_history SET
@@ -59,8 +59,9 @@ export async function saveBattleHistory(battleHistory: {
                 player_name = $11,
                 kokomi_battle_id = $12,
                 raw_data = $13,
-                teams_count = $14
-            WHERE start_time = $15;
+                teams_count = $14,
+                start_time = $15
+            WHERE timestamp = $16;
         `, [
             battleHistory.map_display_name,
             battleHistory.enemy_server,
@@ -76,14 +77,16 @@ export async function saveBattleHistory(battleHistory: {
             battleHistory.kokomi_battle_id,
             battleHistory.raw_data,
             battleHistory.teams_count,
-            battleHistory.start_time
+            battleHistory.start_time.toISOString(),
+            battleHistory.timestamp
         ]).then((res) => {
             return res.rowsAffected;
         });
     } else {
-        // 如果不存在相同 start_time 的记录，则插入新记录
+        // 如果不存在相同 timestamp 的记录，则插入新记录
         return db.execute(`
             INSERT INTO battle_history (
+                timestamp,
                 start_time,
                 kokomi_battle_id,
                 match_group,
@@ -99,9 +102,10 @@ export async function saveBattleHistory(battleHistory: {
                 teammate_server,
                 enemy_server,
                 raw_data
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);
         `, [
-            battleHistory.start_time,
+            battleHistory.timestamp,
+            battleHistory.start_time.toISOString(),
             battleHistory.kokomi_battle_id,
             battleHistory.match_group,
             battleHistory.game_mode,
@@ -120,4 +124,43 @@ export async function saveBattleHistory(battleHistory: {
             return res.rowsAffected;
         });
     }
+}
+
+export async function listLastBattleHistory(limit: number): Promise<BattleHistory[]> {
+    const db = await Database.load("sqlite:data.db");
+    return db.select(`
+        SELECT * FROM battle_history ORDER BY timestamp DESC LIMIT $1;
+    `, [limit]).then((res: any) => {
+        if (res.length > 0) {
+            return res as BattleHistory[];
+        } else {
+            return [];
+        }
+    });
+}
+
+export async function getBattleHistoryById(id: number): Promise<BattleHistory | null> {
+    const db = await Database.load("sqlite:data.db");
+    return db.select(`
+        SELECT * FROM battle_history WHERE id = $1;
+    `, [id]).then((res: any) => {
+        if (res.length > 0) {
+            return res[0] as BattleHistory;
+        } else {
+            return null;
+        }
+    });
+}
+
+export async function getLatestBattleHistory(): Promise<BattleHistory | null> {
+    const db = await Database.load("sqlite:data.db");
+    return db.select(`
+        SELECT * FROM battle_history ORDER BY timestamp DESC LIMIT 1;
+    `).then((res: any) => {
+        if (res.length > 0) {
+            return res[0] as BattleHistory;
+        } else {
+            return null;
+        }
+    })
 }

@@ -14,7 +14,7 @@ fn main() {
             Migration {
                 version: 2,
                 description: "game_battle_history",
-                sql: "CREATE TABLE battle_history (id INTEGER PRIMARY KEY AUTOINCREMENT, start_time TIMESTAMP UNIQUE, kokomi_battle_id INTEGER, match_group TEXT, game_mode INTEGER, map_display_name TEXT, map_id INTEGER, players_per_team INTEGER, teams_count INTEGER, duration INTEGER, player_name TEXT, player_vehicle TEXT, scenario TEXT, teammate_server TEXT, enemy_server TEXT, raw_data TEXT);",
+                sql: "CREATE TABLE battle_history (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp INTEGER UNIQUE, start_time TIMESTAMP, kokomi_battle_id INTEGER, match_group TEXT, game_mode INTEGER, map_display_name TEXT, map_id INTEGER, players_per_team INTEGER, teams_count INTEGER, duration INTEGER, player_name TEXT, player_vehicle TEXT, scenario TEXT, teammate_server TEXT, enemy_server TEXT, raw_data TEXT);",
                 kind: MigrationKind::Up,
             }
         ];

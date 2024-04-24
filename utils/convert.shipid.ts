@@ -1,6 +1,28 @@
+import {fetchShipInfo, fetchShipInfoStack} from "~/composables/requests/yuyuko";
 
 export default function convertShipid(id: string): ShipInfo {
-    return shipMap[id];
+    const shipInfo = shipMap[id];
+    if (shipInfo) {
+        return shipInfo;
+    } else {
+        const shipInfoResp = fetchShipInfoStack(id)
+        if (shipInfoResp === null) {
+            return shipMap[id]
+        }else {
+            return {
+                tier: shipInfoResp.data.level,
+                type: shipInfoResp.data.shipType,
+                nation: shipInfoResp.data.country.toLowerCase(),
+                name: shipInfoResp.data.nameEnglish,
+                ship_name: {
+                    zh_sg: shipInfoResp.data.nameCn,
+                    en: shipInfoResp.data.nameEnglish,
+                    nick: [],
+                    other: [],
+                }
+            }
+        }
+    }
 }
 
 export interface ShipInfo {

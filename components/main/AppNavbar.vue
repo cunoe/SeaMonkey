@@ -5,6 +5,7 @@
         <!-- 左侧链接部分 -->
         <div>
           <nuxt-link to="/" class="btn btn-ghost text-xl text-gray-400 hover:text-white">首页</nuxt-link>
+          <nuxt-link to="/history" class="btn btn-ghost text-xl text-gray-400 hover:text-white">历史</nuxt-link>
           <nuxt-link to="/settings" class="btn btn-ghost text-xl text-gray-400 hover:text-white">设置</nuxt-link>
           <nuxt-link to="/about" class="btn btn-ghost text-xl text-gray-400 hover:text-white">关于</nuxt-link>
         </div>

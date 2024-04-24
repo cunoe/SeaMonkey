@@ -78,10 +78,12 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 700,
+        "height": 800,
         "resizable": true,
         "title": "SeaMonkey - 谁是海猴？",
-        "width": 1300
+        "width": 1440,
+        "minHeight": 800,
+        "minWidth": 1440
       }
     ]
   }
