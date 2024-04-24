@@ -61,7 +61,7 @@
         "digestAlgorithm": "sha256",
         "timestampUrl": "",
         "nsis": {
-          "languages": ["SimpChinese", "English"],
+          "languages": ["SimpChinese"],
           "displayLanguageSelector": true
         }
       }
