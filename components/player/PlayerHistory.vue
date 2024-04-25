@@ -69,7 +69,16 @@ onMounted(async () => {
   if (result) {
     battleHistory.value = result
     let gameData: GameData = JSON.parse(result.raw_data)
-    let playersInfo: Vehicle[] = gameData.vehicles.map(item => {return {...item,shipInfo:convertShipid(String(item.shipId))}})
+    let playersInfo: Vehicle[] = [];
+    for (let i = 0; i < gameData.vehicles.length; i++) {
+      let getShipInfo = await convertShipid(String(gameData.vehicles[i].shipId))
+      if (getShipInfo) {
+        playersInfo.push({
+          ...gameData.vehicles[i],
+          shipInfo: getShipInfo
+        })
+      }
+    }
     player.value = <Vehicle>playersInfo.find(item => item.relation === 0)
     teammates.value = sortShip(playersInfo.filter(item => item.relation !== 2))
     enemies.value = sortShip(playersInfo.filter(item => item.relation === 2))
@@ -150,7 +159,7 @@ function randomGenerateDateByNumber(n: number): number[] {
         <div class="columns-2 p-4 gap-2">
           <div>
             <div v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
-              <TeammateCard :playerInfo="item"/>
+              <TeammateCard :playerInfo="item" :server="battleHistory.teammate_server"/>
             </div>
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
@@ -162,7 +171,7 @@ function randomGenerateDateByNumber(n: number): number[] {
           </div>
           <div>
             <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1 flex justify-start">
-              <EnemyCard :playerInfo="item" />
+              <EnemyCard :playerInfo="item" :server="battleHistory.enemy_server" />
             </div>
             <template v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">

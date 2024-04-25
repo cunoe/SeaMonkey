@@ -15,6 +15,7 @@ export interface BattleHistory {
     scenario: string;
     teammate_server: string;
     enemy_server: string;
+    tire: number;
     raw_data: string;
 }
 import Database from "tauri-plugin-sql-api";
@@ -33,6 +34,7 @@ export async function saveBattleHistory(battleHistory: {
     game_mode: number;
     player_name: string;
     kokomi_battle_id: number;
+    tire: number;
     raw_data: string;
     teams_count: number;
     timestamp: number;
@@ -60,8 +62,9 @@ export async function saveBattleHistory(battleHistory: {
                 kokomi_battle_id = $12,
                 raw_data = $13,
                 teams_count = $14,
-                start_time = $15
-            WHERE timestamp = $16;
+                start_time = $15,
+                tire = $16
+            WHERE timestamp = $17;
         `, [
             battleHistory.map_display_name,
             battleHistory.enemy_server,
@@ -78,6 +81,7 @@ export async function saveBattleHistory(battleHistory: {
             battleHistory.raw_data,
             battleHistory.teams_count,
             battleHistory.start_time.toISOString(),
+            battleHistory.tire,
             battleHistory.timestamp
         ]).then((res) => {
             return res.rowsAffected;
@@ -101,8 +105,9 @@ export async function saveBattleHistory(battleHistory: {
                 scenario,
                 teammate_server,
                 enemy_server,
+                tire,
                 raw_data
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17);
         `, [
             battleHistory.timestamp,
             battleHistory.start_time.toISOString(),
@@ -119,6 +124,7 @@ export async function saveBattleHistory(battleHistory: {
             battleHistory.scenario,
             battleHistory.teammate_server,
             battleHistory.enemy_server,
+            battleHistory.tire,
             battleHistory.raw_data
         ]).then((res) => {
             return res.rowsAffected;

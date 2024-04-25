@@ -27,21 +27,27 @@ function formatDate(date: Date): string {
       <div class="grid grid-cols-1 gap-4">
         <div v-for="(item, index) in histories" :key="index" class="rounded-lg p-1">
           <a @click="navigateTo(`/history/${item.id}`)">
-            <div class="card text-primary-content hover-scale cursor-pointer" style="background-color: #0fb4ff">
+            <div class="card hover-scale cursor-pointer text-primary-content" style="background-color: #7678ed">
               <div class="card-body">
                 <div class="card-title" style="display: flex; justify-content: space-between;">
-                  <div class="flex flex-row">
+                  <div class="flex flex-row gap-1">
+
                     <h2>{{ item.player_name }}</h2>
-                    <h2>{{ item.player_vehicle }}</h2>
+
                   </div>
                   <h2>{{ formatDate(item.start_time) }}</h2>
                 </div>
-                <div class="flex flex-row">
-                  <p class="text-start"> Main Info </p>
-                  <div class="card-actions justify-end">
-                    <button class="btn btn-primary" @click="navigateTo(`/history/${item.id}`)">Other Info</button>
-                  </div>
+                <div class="flex flex-row gap-1 font-bold">
+                  <h2 class="badge bg-fuchsia-600 text-black">{{item.match_group}}</h2>
+                  <h2>{{item.player_vehicle}}</h2>
+                  <h2>{{ item.tire !== -1 ? numberToRoman(item.tire) : ''}}</h2>
                 </div>
+<!--                <div class="flex flex-row">-->
+<!--                  <p class="text-start"> Main Info </p>-->
+<!--                  <div class="card-actions justify-end">-->
+<!--                    <button class="btn btn-primary" @click="navigateTo(`/history/${item.id}`)">Other Info</button>-->
+<!--                  </div>-->
+<!--                </div>-->
               </div>
             </div>
           </a>

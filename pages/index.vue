@@ -44,7 +44,7 @@ onMounted(async () => {
     let clanEnemyServerSet = await getKV("clanEnemyServer")
     if (gameDirSet === '' || gameServerSet === '') {openNeededSettingsModal()}
     const command = Command.sidecar('binaries/replay-parser', ["-p", gameDirSet])
-    command.execute().then((res) => {
+    command.execute().then(async (res) => {
           // 如果返回值为 -1，则表示游戏目录错误
           if (res.stdout === "-1") {
             openNeededSettingsModal()
@@ -58,7 +58,16 @@ onMounted(async () => {
             let gameDataRaw = strArr[0]
             let gameServerAutoDetect = strArr[1]
             gameDataParse.value = JSON.parse(gameDataRaw)
-            let playersInfo: Vehicle[] = gameDataParse.value.vehicles.map(item => {return {...item,shipInfo:convertShipid(String(item.shipId))}})
+            let playersInfo: Vehicle[] = [];
+            for (let i = 0; i < gameDataParse.value.vehicles.length; i++) {
+              let getShipInfo = await convertShipid(String(gameDataParse.value.vehicles[i].shipId))
+              if (getShipInfo) {
+                playersInfo.push({
+                  ...gameDataParse.value.vehicles[i],
+                  shipInfo: getShipInfo
+                })
+              }
+            }
             player.value = <Vehicle>playersInfo.find(item => item.relation === 0)
 
             let teammateServer: string
@@ -74,13 +83,17 @@ onMounted(async () => {
             } else {
               teammateServer = gameServerSet
             }
-            if (clanEnemyServerSet === 'sync') {
-              enemyServer = teammateServer
+            if (gameDataParse.value.matchGroup.toUpperCase() === 'CLAN') {
+              if (clanEnemyServerSet === 'sync') {
+                enemyServer = teammateServer
+              } else {
+                enemyServer = clanEnemyServerSet
+              }
             } else {
-              enemyServer = clanEnemyServerSet
+              enemyServer = teammateServer
             }
 
-            saveBattleHistory({
+            await saveBattleHistory({
               timestamp: parseDatetime(gameDataParse.value.dateTime).getTime(),
               kokomi_battle_id: 0,
               start_time: parseDatetime(gameDataParse.value.dateTime),
@@ -96,6 +109,7 @@ onMounted(async () => {
               scenario: gameDataParse.value.scenario,
               teammate_server: teammateServer,
               enemy_server: enemyServer,
+              tire: (player.value.shipInfo ? player.value.shipInfo.tier : -1),
               raw_data: gameDataRaw
             })
           }

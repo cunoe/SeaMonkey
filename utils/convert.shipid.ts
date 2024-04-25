@@ -1,15 +1,20 @@
-import {fetchShipInfo, fetchShipInfoStack} from "~/composables/requests/yuyuko";
+import {fetchShipInfo} from "~/composables/requests/yuyuko";
+import {getKV, saveKV} from "~/composables/store/kv";
 
-export default function convertShipid(id: string): ShipInfo {
+export default async function convertShipid(id: string): Promise<ShipInfo | null> {
     const shipInfo = shipMap[id];
     if (shipInfo) {
         return shipInfo;
     } else {
-        const shipInfoResp = fetchShipInfoStack(id)
+        const cacheShipInfo = await getKV(`ship_info_${id}`)
+        if (cacheShipInfo) {
+            return JSON.parse(cacheShipInfo)
+        }
+        const shipInfoResp = await fetchShipInfo(id)
         if (shipInfoResp === null) {
-            return shipMap[id]
+            return null
         }else {
-            return {
+            let cacheShipInfo = {
                 tier: shipInfoResp.data.level,
                 type: shipInfoResp.data.shipType,
                 nation: shipInfoResp.data.country.toLowerCase(),
@@ -21,6 +26,8 @@ export default function convertShipid(id: string): ShipInfo {
                     other: [],
                 }
             }
+            await saveKV(`ship_info_${id}`, JSON.stringify(cacheShipInfo))
+            return cacheShipInfo
         }
     }
 }

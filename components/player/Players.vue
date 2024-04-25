@@ -23,7 +23,16 @@ onMounted(async () => {
     let result = await getLatestBattleHistory()
     if (result) {
       let gameData: GameData = JSON.parse(result.raw_data)
-      let playersInfo: Vehicle[] = gameData.vehicles.map(item => {return {...item,shipInfo:convertShipid(String(item.shipId))}})
+      let playersInfo: Vehicle[] = [];
+      for (let i = 0; i < gameData.vehicles.length; i++) {
+        let getShipInfo = await convertShipid(String(gameData.vehicles[i].shipId))
+        if (getShipInfo) {
+          playersInfo.push({
+            ...gameData.vehicles[i],
+            shipInfo: getShipInfo
+          })
+        }
+      }
       player.value = <Vehicle>playersInfo.find(item => item.relation === 0)
       teammates.value = sortShip(playersInfo.filter(item => item.relation !== 2))
       enemies.value = sortShip(playersInfo.filter(item => item.relation === 2))
@@ -80,7 +89,7 @@ onMounted(async () => {
           </div>
           <div>
             <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1">
-              <EnemyCard :playerInfo="item" />
+              <EnemyCard :playerInfo="item" :server="battleHistory.enemy_server"/>
             </div>
             <template v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">
