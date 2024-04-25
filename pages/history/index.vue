@@ -26,23 +26,25 @@ function formatDate(date: Date): string {
     <div class="container max-w-screen-md">
       <div class="grid grid-cols-1 gap-4">
         <div v-for="(item, index) in histories" :key="index" class="rounded-lg p-1">
-          <div class="card text-primary-content" style="background-color: #0fb4ff">
-            <div class="card-body">
-              <div class="card-title" style="display: flex; justify-content: space-between;">
-                <div class="flex flex-row">
-                  <h2>{{ item.player_name }}</h2>
-                  <h2>{{ item.player_vehicle }}</h2>
+          <a @click="navigateTo(`/history/${item.id}`)">
+            <div class="card text-primary-content hover-scale cursor-pointer" style="background-color: #0fb4ff">
+              <div class="card-body">
+                <div class="card-title" style="display: flex; justify-content: space-between;">
+                  <div class="flex flex-row">
+                    <h2>{{ item.player_name }}</h2>
+                    <h2>{{ item.player_vehicle }}</h2>
+                  </div>
+                  <h2>{{ formatDate(item.start_time) }}</h2>
                 </div>
-                <h2>{{ formatDate(item.start_time) }}</h2>
-              </div>
-              <div class="flex flex-row">
-                <p class="text-start"> Main Info </p>
-                <div class="card-actions justify-end">
-                  <button class="btn btn-primary" @click="navigateTo(`/history/${item.id}`)">Other Info</button>
+                <div class="flex flex-row">
+                  <p class="text-start"> Main Info </p>
+                  <div class="card-actions justify-end">
+                    <button class="btn btn-primary" @click="navigateTo(`/history/${item.id}`)">Other Info</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -51,5 +53,12 @@ function formatDate(date: Date): string {
 
 
 <style scoped>
+.hover-scale {
+  transition: transform 0.3s ease-in-out; /* 添加变换效果的过渡动画 */
+}
+
+.hover-scale:hover {
+  transform: scale(1.05); /* 鼠标悬停时放大 5% */
+}
 
 </style>

@@ -12,6 +12,9 @@ import convertMatchGroup from "~/utils/convert.matchgroup";
 import convertSecondsToString from "~/utils/convert.seconds.to.string";
 import numberToRoman from "~/utils/number.to.roman";
 import {convertDateToStr} from "~/utils/convert.date.to.string";
+import { Bar } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const props = defineProps<{
   battleId: number
@@ -26,6 +29,41 @@ const isReady = ref(false)
 const duration = ref(0)
 const battleHistory = ref<BattleHistory>(null as unknown as BattleHistory)
 
+const playersDamageChartData: Ref<any> = ref({
+  labels: [],
+  datasets: [
+    {
+      label: 'Players Damage',
+      backgroundColor: '#46cdcf',
+      data: [],
+    }
+  ]
+})
+
+const playersExpChartData: Ref<any> = ref({
+  labels: [],
+  datasets: [
+    {
+      label: 'Players Exp',
+      backgroundColor: '#46cdcf',
+      data: [],
+    }
+  ]
+})
+
+const chartOptions: Ref<any> = ref({
+    responsive: true,
+        plugins: {
+    legend: {
+      position: 'top' as const,
+    },
+    title: {
+      display: false,
+          text: 'Chart.js Bar Chart'
+    }
+  }
+})
+
 onMounted(async () => {
   let result = await getBattleHistoryById(props.battleId)
   if (result) {
@@ -38,6 +76,10 @@ onMounted(async () => {
     maxItem.value = Math.max(teammates.value.length, enemies.value.length)
     gameInfo.value = gameData
     isReady.value = true
+    playersDamageChartData.value.labels = playersInfo.map(item => item.name)
+    playersDamageChartData.value.datasets[0].data = randomGenerateDateByNumber(playersInfo.length)
+    playersExpChartData.value.labels = playersInfo.map(item => item.name)
+    playersExpChartData.value.datasets[0].data = randomGenerateDateByNumber(playersInfo.length).sort((a,b) => b-a)
   }
   useIntervalFn(async () => {
     if (gameInfo.value) {
@@ -46,6 +88,14 @@ onMounted(async () => {
   }, 1000)
 })
 
+
+function randomGenerateDateByNumber(n: number): number[] {
+  let result: number[] = []
+  for (let i = 0; i < n; i++) {
+    result.push(Math.floor(Math.random() * 10000))
+  }
+  return result
+}
 </script>
 
 <template>
@@ -70,6 +120,16 @@ onMounted(async () => {
     <div v-if="isReady">
       <div class="p-2" />
       <div class="container max-w-full">
+        <div class="max-w-full">
+          <div class="columns-2 p-4 gap-10">
+            <div class="flex justify-center">
+              <Bar :data="playersDamageChartData" :options="chartOptions" class="h-96" />
+            </div>
+            <div class="flex justify-center">
+              <Bar :data="playersExpChartData" :options="chartOptions" class="h-96" />
+            </div>
+          </div>
+        </div>
         <GameStats :duration="duration" :gameData="gameInfo" :player="player" />
         <div class="flex justify-center">
           <div class="stats container">

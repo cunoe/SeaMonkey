@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type {GameData, Vehicle} from '~/types/GameData';
+import {PlayerInfoModal, PlayerShipInfoModal} from "#components";
 
+const modal = useModal()
 const toast = useToast()
 
 const props = defineProps<{
   playerInfo: Vehicle
+  server: string
 }>();
 
 const DMG = 10000
@@ -72,28 +75,45 @@ const DMG = 10000
 <!--    </div>-->
 <!--  </div>-->
   <div>
-    <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-16">
-      <div class="absolute left-4 top-4 leading-loose">
-        <h2 class="text-white font-bold text-xl">{{ playerInfo.name }}</h2>
-        <div class="flex flex-row gap-1">
-          <div class="badge font-bold">WR 56%</div>
-          <div class="badge font-bold">PR 3000</div>
+    <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-12">
+      <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
+        <div class="absolute left-4 top-4 leading-loose hover-scale">
+          <h2 class="text-white font-bold text-xl">{{ playerInfo.name }}</h2>
+          <div class="flex flex-row gap-1">
+            <div class="badge font-bold">WR 56%</div>
+            <div class="badge font-bold">PR 3000</div>
+          </div>
+          <div class="flex flex-row gap-1">
+            <div :class="{ 'badge font-bold bg-red-500': DMG < 100000, 'badge font-bold bg-green-500': DMG >= 100000 }">DMG {{ DMG }}</div>
+            <div class="badge font-bold">EXP 2000</div>
+          </div>
         </div>
-        <div class="flex flex-row gap-1">
-          <div :class="{ 'badge font-bold bg-red-500': DMG < 100000, 'badge font-bold bg-green-500': DMG >= 100000 }">DMG {{ DMG }}</div>
-          <div class="badge font-bold">EXP 2000</div>
+      </a>
+      <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
+        <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[26rem] hover-scale">
+          <div class="absolute right-4 top-4 text-end">
+            <h2 class="text-white font-bold text-xl">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>
+            <div class="flex flex-row gap-1 justify-end">
+              <div class="badge font-bold">PR 3000</div>
+              <div class="badge font-bold">WR 56%</div>
+            </div>
+            <div class="flex flex-row gap-1 justify-end">
+              <div class="badge font-bold">EXP 2000</div>
+              <div class="badge font-bold">DMG 130000</div>
+            </div>
+          </div>
         </div>
-        <p><a @click="toast.add({title:'功能正在开发'})" class="text-white/50 cursor-pointer font-bold">查看更多</a></p>
-      </div>
-      <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[26rem]">
-        <div class="absolute right-4 top-4 text-end">
-          <h2 class="text-white font-bold text-xl">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>
-        </div>
-      </div>
+      </a>
     </div>
   </div>
 </template>
 
 <style scoped>
+.hover-scale {
+  transition: transform 0.3s ease-in-out; /* 添加变换效果的过渡动画 */
+}
 
+.hover-scale:hover {
+  transform: scale(1.05); /* 鼠标悬停时放大 5% */
+}
 </style>

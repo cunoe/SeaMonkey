@@ -15,10 +15,12 @@
     "@nuxt/ui": "^2.15.2",
     "@tauri-apps/api": "^1.5.3",
     "@vueuse/core": "^10.9.0",
+    "chart.js": "^4.4.2",
     "nuxt": "^3.11.1",
     "nuxt-icon": "^0.6.10",
     "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1",
     "vue": "^3.4.21",
+    "vue-chartjs": "^5.3.1",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {

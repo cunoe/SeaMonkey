@@ -2,12 +2,14 @@
 import TeammateCard from "~/components/player/TeammateCard.vue";
 import EnemyCard from "~/components/player/EnemyCard.vue";
 import type {GameData, Vehicle} from "~/types/GameData";
+import type {BattleHistory} from "~/composables/store/battle_history";
 import GameStats from "~/components/player/GameStats.vue";
 import {useIntervalFn} from "@vueuse/core";
 import {getLatestBattleHistory} from "~/composables/store/battle_history";
 import {sortShip} from "#imports";
 import parseDatetime from "~/utils/parse.datetime";
 
+const battleHistory = ref<BattleHistory>(null as unknown as BattleHistory)
 const gameInfo = ref<GameData>(null as unknown as GameData)
 const teammates = ref<Vehicle[]>([])
 const enemies = ref<Vehicle[]>([])
@@ -27,6 +29,7 @@ onMounted(async () => {
       enemies.value = sortShip(playersInfo.filter(item => item.relation === 2))
       maxItem.value = Math.max(teammates.value.length, enemies.value.length)
       gameInfo.value = gameData
+      battleHistory.value = result
       isReady.value = true
     }
   }, 5000)
@@ -65,23 +68,23 @@ onMounted(async () => {
         <div class="columns-2 p-4 gap-2">
           <div>
             <div v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
-              <TeammateCard :playerInfo="item"/>
+              <TeammateCard :playerInfo="item" :server="battleHistory.teammate_server"/>
             </div>
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
-                <div class="rounded-lg p-4">
+                <div class="p-1">
                   <div class="p-12"></div>
                 </div>
               </template>
             </template>
           </div>
           <div>
-            <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1 space-y-10">
+            <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1">
               <EnemyCard :playerInfo="item" />
             </div>
             <template v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">
-                <div class="rounded-lg p-4">
+                <div class="p-1">
                   <div class="p-12"></div>
                 </div>
               </template>
@@ -91,7 +94,6 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>
