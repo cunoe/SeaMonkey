@@ -74,7 +74,7 @@ function print() {
 <!--  </div>-->
   <div>
     <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-12">
-      <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
+      <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
         <div class="absolute right-4 top-4 leading-loose text-end hover-scale">
           <h2 class="text-white font-bold text-xl">{{ playerInfo.name }}</h2>
           <div class="flex flex-row gap-1 justify-end">
@@ -88,7 +88,7 @@ function print() {
   <!--        <p><a href="https://baidu.com" class="text-white/50">More</a></p>-->
         </div>
       </a>
-      <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
+      <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
         <div class="absolute inset-y-0 left-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[26rem] hover-scale">
           <div class="absolute left-4 top-4 text-start">
             <h2 class="text-white font-bold text-xl">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>

@@ -14,6 +14,7 @@ import numberToRoman from "~/utils/number.to.roman";
 import {convertDateToStr} from "~/utils/convert.date.to.string";
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import convertServerToLocale from "../../utils/convert.server";
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const props = defineProps<{
@@ -148,11 +149,11 @@ function randomGenerateDateByNumber(n: number): number[] {
             </div>
             <div class="stat text-center">
               <div class="stat-title">队友服务器</div>
-              <div class="stat-value">{{ battleHistory.teammate_server }}</div>
+              <div class="stat-value">{{ convertServerToLocale(battleHistory.teammate_server, 'zh-CN') }}</div>
             </div>
             <div class="stat text-center">
               <div class="stat-title">敌方服务器</div>
-              <div class="stat-value">{{ battleHistory.enemy_server }}</div>
+              <div class="stat-value">{{ convertServerToLocale(battleHistory.enemy_server, 'zh-CN') }}</div>
             </div>
           </div>
         </div>
