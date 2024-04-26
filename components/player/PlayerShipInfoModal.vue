@@ -30,73 +30,45 @@ function changeIsReady() {
   isReady.value = !isReady.value
 }
 
-const columns = [
-  {
-    key: 'id',
-    label: '数据类型'
-  }, {
-    key: 'num',
-    label: '场数'
-  }, {
-    key: 'pr',
-    label: '评分'
-  }, {
-    key: 'wr',
-    label: '胜率'
-  }, {
-    key: 'dmg',
-    label: '伤害'
-  }, {
-    key: 'kd',
-    label: 'K/D'
-  }, {
-    key: 'exp',
-    label: '经验'
-  }
-]
-
-const items = [{
-  id: '单野',
-  num: 100,
-  pr: '还需努力',
-  wr: '30%',
-  dmg: 10000,
-  kd: 0.1,
-  exp: 100,
-  // class: 'bg-red-500/50 dark:bg-red-400/50'
-}, {
-  id: '自行车',
-  num: 100,
-  pr: '大佬平均',
-  wr: '30%',
-  dmg: 10000,
-  kd: 0.1,
-  exp: 100,
-  // class: 'bg-red-500/50 dark:bg-red-400/50'
-}, {
-  id: '三轮车',
-  num: 100,
-  pr: '大佬平均',
-  wr: '30%',
-  dmg: 10000,
-  kd: 0.1,
-  exp: 100,
-  // class: 'bg-red-500/50 dark:bg-red-400/50'
-}, {
-  id: '软壳',
-  num: 100,
-  pr: '大佬平均',
-  wr: '30%',
-  dmg: 10000,
-  kd: 0.1,
-  exp: 100,
-}]
-
+const change = ref(true)
+function changeChange() {
+  change.value = !change.value
+}
 </script>
 
 <template>
   <UModal>
-    <div class="flex flex-col items-center justify-center">
+    <div v-if="change" class="flex flex-col items-center justify-center">
+      <div class="card w-[48rem] bg-base-200 shadow-xl">
+        <div class="card-body">
+
+          <div class="card-title flex flex-row items-center justify-between">
+            <div>
+              <div class="text-xl font-bold join">
+                <p class="text-blue-500 join">[NASA]</p>
+                {{ player.name }}
+                <div class="badge badge-neutral">
+                  {{ convertServerToLocale(playerServer, '') }}
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-xl font-bold join">
+                {{player.shipInfo ? player.shipInfo.ship_name.zh_sg+' '+numberToRoman(player.shipInfo.tier) : '不认识这艘船捏'}}
+              </div>
+              <div class="card-actions join">
+                <button class="btn btn-square btn-sm" @click="changeChange()">
+                  <Icon name="tabler:switch-horizontal" class="text-xl"/>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          本场数据（WIP），右上角可切换全部数据，该界面仅历史记录中点开才展示 首页点开默认显示全部数据
+        </div>
+      </div>
+    </div>
+    <div v-if="!change" class="flex flex-col items-center justify-center">
       <div class="card w-[48rem] bg-base-200 shadow-xl">
         <div class="card-body">
           <div class="card-title flex flex-row items-center justify-between">
@@ -110,8 +82,13 @@ const items = [{
               </div>
             </div>
             <div>
-              <div class="text-xl font-bold">
+              <div class="text-xl font-bold join">
                 {{player.shipInfo ? player.shipInfo.ship_name.zh_sg+' '+numberToRoman(player.shipInfo.tier) : '不认识这艘船捏'}}
+              </div>
+              <div class="card-actions join">
+                <button class="btn btn-square btn-sm" @click="changeChange()">
+                  <Icon name="tabler:switch-horizontal" class="text-xl" />
+                </button>
               </div>
             </div>
           </div>
@@ -156,14 +133,118 @@ const items = [{
                   </div>
                 </div>
               </div>
-              <UTable :rows="items" :columns="columns">
-                <template #pr-data="{ row }">
-                  <p class="text-pink-600 font-bold">{{ row.pr }}</p>
-                </template>
-                <template #wr-data="{ row }">
-                  <p class="text-red-600 font-bold">{{ row.wr }}</p>
-                </template>
-              </UTable>
+              <div class="p-1"></div>
+              <div class="grid grid-cols-[100px_100px_150px_100px_100px_70px_100px] font-bold">
+                <div><p class="text-center">数据类型</p></div>
+                <div><p class="text-center">场数</p></div>
+                <div><p class="text-center">评分</p></div>
+                <div><p class="text-center">胜率</p></div>
+                <div><p class="text-center">伤害</p></div>
+                <div><p class="text-center">K/D</p></div>
+                <div><p class="text-center">经验</p></div>
+              </div>
+              <hr class="my-2 border-t border-gray-600 opacity-50">
+              <div class="grid grid-cols-[100px_100px_150px_100px_100px_70px_100px] font-bold divide-x divide-gray-600 divide-opacity-50 auto-rows-max">
+                <div>
+                  <div class="text-center text-white">
+                    <p class="">单野</p>
+                  </div>
+                  <div class="text-center text-white">
+                    <p class="">自行车</p>
+                  </div>
+                  <div class="text-center text-white">
+                    <p class="">三轮车</p>
+                  </div>
+                  <div class="text-center text-white">
+                    <p class="">软壳</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="">123</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">123</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">123</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">123</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-pink-600">大佬平均+2000</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-pink-600">大佬平均+2000</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-pink-600">大佬平均+2000</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-pink-600">大佬平均+2000</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">74.89%</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">74.89%</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">74.89%</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">74.89%</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">123456</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">123456</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">123456</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="text-purple-600">123456</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="">4.5</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">4.5</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">4.5</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">4.5</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="">1234</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">1234</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">1234</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="">1234</p>
+                  </div>
+                </div>
+              </div>
+              <div class="p-2"></div>
               <div class="grid grid-cols-3 font-bold">
                 <div><p class="text-center">其他数据</p></div>
                 <div><p class="text-center">武器命中率</p></div>
