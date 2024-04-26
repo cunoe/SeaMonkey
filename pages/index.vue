@@ -45,9 +45,11 @@ onMounted(async () => {
     if (gameDirSet === '' || gameServerSet === '') {openNeededSettingsModal()}
     const command = Command.sidecar('binaries/replay-parser', ["-p", gameDirSet])
     command.execute().then(async (res) => {
-          // 如果返回值为 -1，则表示游戏目录错误
+          // 如果返回值为 -1，则表示未读取到 战斗记录
           if (res.stdout === "-1") {
-            openNeededSettingsModal()
+            toast.add({
+              title: "未检测到战斗记录，请启动游戏或修改游戏目录~"
+            })
           } else if (res.stdout !== "") {
             let strArr = res.stdout.split('------split------')
             if (strArr.length !== 2) {
@@ -114,7 +116,7 @@ onMounted(async () => {
             })
           }
         }
-    ).catch(err => {console.log(err)});
+    ).catch(err => {toast.add({title: err})});
   }, 5000)
 })
 
