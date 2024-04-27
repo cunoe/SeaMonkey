@@ -46,10 +46,13 @@ onMounted(async () => {
     const command = Command.sidecar('binaries/replay-parser', ["-p", gameDirSet])
     command.execute().then(async (res) => {
           // 如果返回值为 -1，则表示未读取到 战斗记录
-          if (res.stdout === "-1") {
+          if (res.stdout === "-2") {
             toast.add({
-              title: "未检测到战斗记录，请启动游戏或修改游戏目录~"
+              title: "未找到 replays 文件夹，请检查游戏目录是否正确"
             })
+            throw new Error("未检测replays文件夹")
+          } else if (res.stdout === "-1") {
+            throw new Error("未检测到战斗记录")
           } else if (res.stdout !== "") {
             let strArr = res.stdout.split('------split------')
             if (strArr.length !== 2) {
@@ -116,7 +119,7 @@ onMounted(async () => {
             })
           }
         }
-    ).catch(err => {toast.add({title: err})});
+    ).catch(err => {console.log(err)});
   }, 5000)
 })
 

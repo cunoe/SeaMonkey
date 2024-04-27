@@ -22,7 +22,7 @@ func main() {
 	}
 
 	if !checkReplaysFolder(readPath) {
-		fmt.Print("-1")
+		fmt.Print("-2")
 		return
 	}
 
