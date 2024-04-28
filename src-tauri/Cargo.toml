@@ -17,7 +17,8 @@ tauri-build = { version = "1.5.1", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.6.1", features = [ "updater", "api-all"] }
+tauri = { version = "1.6.1", features = [ "path-all", "dialog-open", "updater"] }
+regex = "1.10.4"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
@@ -26,6 +27,7 @@ tauri = { version = "1.6.1", features = [ "updater", "api-all"] }
 custom-protocol = [ "tauri/custom-protocol" ]
 
 [dependencies.tauri-plugin-sql]
+# git = "ssh://git@ssh.github.com:443/tauri-apps/plugins-workspace.git"
 git = "https://github.com/tauri-apps/plugins-workspace"
 branch = "v1"
 features = ["sqlite"]

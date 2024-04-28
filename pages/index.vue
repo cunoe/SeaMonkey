@@ -1,23 +1,21 @@
 <script lang="ts" setup>
-import { Command } from '@tauri-apps/api/shell'
+import { invoke } from "@tauri-apps/api/tauri";
 import { useIntervalFn } from '@vueuse/core'
 import { getKV } from "~/composables/store/kv";
 
 import parseDatetime from "~/utils/parse.datetime";
+import convertMatchGroup from "~/utils/convert.matchgroup";
 
 import Players from "~/components/player/Players.vue";
-import { SettingsNeededSettingsModal } from '#components';
-
-import type {Ref} from "vue";
 import type {GameData, Vehicle} from "~/types/GameData";
 import {saveBattleHistory} from "~/composables/store/battle_history";
-import convertMatchGroup from "~/utils/convert.matchgroup";
+
+
+import { SettingsNeededSettingsModal } from '#components';
 
 const modal = useModal()
 const toast = useToast()
 
-const gameDataParse: Ref<GameData> = ref(null as unknown as GameData)
-const player: Ref<Vehicle> = ref(null as unknown as Vehicle)
 const checkModal = ref(false)
 
 function openNeededSettingsModal() {
@@ -43,83 +41,90 @@ onMounted(async () => {
     let gameServerSet = await getKV("gameServer")
     let clanEnemyServerSet = await getKV("clanEnemyServer")
     if (gameDirSet === '' || gameServerSet === '') {openNeededSettingsModal()}
-    const command = Command.sidecar('binaries/replay-parser', ["-p", gameDirSet])
-    command.execute().then(async (res) => {
-          // 如果返回值为 -1，则表示未读取到 战斗记录
-          if (res.stdout === "-2") {
-            toast.add({
-              title: "未找到 replays 文件夹，请检查游戏目录是否正确"
-            })
-            throw new Error("未检测replays文件夹")
-          } else if (res.stdout === "-1") {
-            throw new Error("未检测到战斗记录")
-          } else if (res.stdout !== "") {
-            let strArr = res.stdout.split('------split------')
-            if (strArr.length !== 2) {
-              toast.add({
-                title: "解析错误，检查游戏目录是否正确",
+    // 获取游戏目录下的战斗信息
+    invoke('get_replays_temp_info', {gameDir: gameDirSet})
+        .then(async (res: any) => {
+          let gameDataParse: GameData
+          if (typeof res === "string") {
+            gameDataParse = JSON.parse(res)
+          } else {
+            throw new Error('数据解析失败')
+          }
+          let playersInfo: Vehicle[] = [];
+          for (let i = 0; i < gameDataParse.vehicles.length; i++) {
+            let getShipInfo = await convertShipid(String(gameDataParse.vehicles[i].shipId))
+            if (getShipInfo) {
+              playersInfo.push({
+                ...gameDataParse.vehicles[i],
+                shipInfo: getShipInfo
               })
             }
-            let gameDataRaw = strArr[0]
-            let gameServerAutoDetect = strArr[1]
-            gameDataParse.value = JSON.parse(gameDataRaw)
-            let playersInfo: Vehicle[] = [];
-            for (let i = 0; i < gameDataParse.value.vehicles.length; i++) {
-              let getShipInfo = await convertShipid(String(gameDataParse.value.vehicles[i].shipId))
-              if (getShipInfo) {
-                playersInfo.push({
-                  ...gameDataParse.value.vehicles[i],
-                  shipInfo: getShipInfo
-                })
-              }
-            }
-            player.value = <Vehicle>playersInfo.find(item => item.relation === 0)
+          }
+          let player: Vehicle | undefined
+          player = playersInfo.find(item => item.relation === 0)
+          if (!player) {
+            toast.add({
+              title: "出现意外错误！请联系开发者！",
+            })
+            throw new Error('无法获取玩家信息')
+          }
 
-            let teammateServer: string
-            let enemyServer: string
+          let teammateServer = 'unknown';
+          let enemyServer = 'unknown';
+          try {
             if (gameServerSet === 'auto') {
-              if (gameServerAutoDetect === '-1') {
-                toast.add({
-                  title: "无法自动获取服务器，请手动设置",
-                })
-                throw new Error('无法自动获取服务器')
-              }
-              teammateServer = gameServerAutoDetect
-            } else {
-              teammateServer = gameServerSet
-            }
-            if (gameDataParse.value.matchGroup.toUpperCase() === 'CLAN') {
-              if (clanEnemyServerSet === 'sync') {
-                enemyServer = teammateServer
-              } else {
-                enemyServer = clanEnemyServerSet
+              const res = await invoke('get_selected_realm', { gameDir: gameDirSet });
+              if (typeof res === 'string') {
+                teammateServer = res;
               }
             } else {
-              enemyServer = teammateServer
+              teammateServer = gameServerSet;
             }
 
-            await saveBattleHistory({
-              timestamp: parseDatetime(gameDataParse.value.dateTime).getTime(),
-              kokomi_battle_id: 0,
-              start_time: parseDatetime(gameDataParse.value.dateTime),
-              match_group: convertMatchGroup(gameDataParse.value.matchGroup).name,
-              game_mode: gameDataParse.value.gameMode,
-              map_display_name: convertMapid(gameDataParse.value.mapId).name,
-              map_id: gameDataParse.value.mapId,
-              players_per_team: gameDataParse.value.playersPerTeam,
-              teams_count: gameDataParse.value.teamsCount,
-              duration: gameDataParse.value.duration,
-              player_name: player.value.name,
-              player_vehicle: (player.value.shipInfo ? player.value.shipInfo.ship_name.zh_sg : '不认识这艘船捏'),
-              scenario: gameDataParse.value.scenario,
-              teammate_server: teammateServer,
-              enemy_server: enemyServer,
-              tire: (player.value.shipInfo ? player.value.shipInfo.tier : -1),
-              raw_data: gameDataRaw
+            if (gameDataParse.matchGroup.toUpperCase() === 'CLAN') {
+              enemyServer = clanEnemyServerSet === 'sync' ? teammateServer : clanEnemyServerSet;
+            } else {
+              enemyServer = teammateServer;
+            }
+          } catch (err) {
+            console.log(err);
+          }
+
+          if (teammateServer === 'unknown' || enemyServer === 'unknown') {
+            toast.add({
+              title: "错误：未获取到服务器信息！可能无法自动检测，请尝试手动选择服务器！",
+            });
+            throw new Error('teamServer or enemyServer is unknown')
+          }
+
+          await saveBattleHistory({
+            timestamp: parseDatetime(gameDataParse.dateTime).getTime(),
+            kokomi_battle_id: 0,
+            start_time: parseDatetime(gameDataParse.dateTime),
+            match_group: convertMatchGroup(gameDataParse.matchGroup).name,
+            game_mode: gameDataParse.gameMode,
+            map_display_name: convertMapid(gameDataParse.mapId).name,
+            map_id: gameDataParse.mapId,
+            players_per_team: gameDataParse.playersPerTeam,
+            teams_count: gameDataParse.teamsCount,
+            duration: gameDataParse.duration,
+            player_name: player.name,
+            player_vehicle: (player.shipInfo ? player.shipInfo.ship_name.zh_sg : '不认识这艘船捏'),
+            scenario: gameDataParse.scenario,
+            teammate_server: teammateServer,
+            enemy_server: enemyServer,
+            tire: (player.shipInfo ? player.shipInfo.tier : -1),
+            raw_data: res
+          })
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err === '1002') {
+            toast.add({
+              title: "错误：游戏目录下没有找到replays文件夹，请检查游戏目录是否正确！",
             })
           }
-        }
-    ).catch(err => {console.log(err)});
+        })
   }, 5000)
 })
 

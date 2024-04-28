@@ -13,21 +13,11 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
-      "shell": {
-        "sidecar": true,
-        "scope": [
-          {
-            "name": "binaries/replay-parser",
-            "sidecar": true,
-            "args": [
-              "-p",
-              {
-                "validator": "\\S+"
-              }
-            ]
-          }
-        ]
+      "dialog": {
+        "open": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {
@@ -37,9 +27,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [
-        "binaries/replay-parser"
-      ],
+      "externalBin": [],
       "icon": [
         "icons/sea-monkey.png",
         "icons/icon.ico"
