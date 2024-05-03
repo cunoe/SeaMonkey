@@ -132,11 +132,11 @@ export async function saveBattleHistory(battleHistory: {
     }
 }
 
-export async function listLastBattleHistory(limit: number): Promise<BattleHistory[]> {
+export async function listLastBattleHistory(limit: number, offset: number): Promise<BattleHistory[]> {
     const db = await Database.load("sqlite:data.db");
     return db.select(`
-        SELECT * FROM battle_history ORDER BY timestamp DESC LIMIT $1;
-    `, [limit]).then((res: any) => {
+        SELECT * FROM battle_history ORDER BY timestamp DESC LIMIT $1 OFFSET $2;
+    `, [limit, offset]).then((res: any) => {
         if (res.length > 0) {
             return res as BattleHistory[];
         } else {

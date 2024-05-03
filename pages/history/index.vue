@@ -2,10 +2,29 @@
 
 import {type BattleHistory, listLastBattleHistory} from "~/composables/store/battle_history";
 
+const toast = useToast()
+
 const histories: Ref<BattleHistory[]> = ref([])
+const limit = ref(10)
+const offset = ref(0)
+
+async function loadMore() {
+  offset.value += limit.value
+  let moreHistories = await listLastBattleHistory(limit.value, offset.value)
+  if (moreHistories.length === 0) {
+    toast.add({
+      title: "没有更多历史记录了",
+    })
+    return
+  }
+  for (let i = 0; i < moreHistories.length; i++) {
+    moreHistories[i].start_time = new Date(moreHistories[i].start_time)
+  }
+  histories.value.push(...moreHistories)
+}
 
 onMounted(async () => {
-    histories.value = await listLastBattleHistory(10)
+    histories.value = await listLastBattleHistory(limit.value, offset.value)
     for (let i = 0; i < histories.value.length; i++) {
         histories.value[i].start_time = new Date(histories.value[i].start_time)
     }
@@ -53,7 +72,11 @@ function formatDate(date: Date): string {
           </a>
         </div>
       </div>
+      <div class="flex justify-center items-center">
+        <button class="btn btn-wide" @click="loadMore">查看更多</button>
+      </div>
     </div>
+
   </div>
 </template>
 
