@@ -8,18 +8,23 @@ import {getBattleHistoryById, getLatestBattleHistory} from "~/composables/store/
 import type {BattleHistory} from "~/composables/store/battle_history";
 import {sortShip} from "#imports";
 import parseDatetime from "~/utils/parse.datetime";
-import convertMatchGroup from "~/utils/convert.matchgroup";
-import convertSecondsToString from "~/utils/convert.seconds.to.string";
-import numberToRoman from "~/utils/number.to.roman";
 import {convertDateToStr} from "~/utils/convert.date.to.string";
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import convertServerToLocale from "../../utils/convert.server";
+import {
+  type BattleDataRequest,
+  type BattleResponse,
+  defaultBattleData,
+  fetchBattleData
+} from "~/composables/requests/kokomi";
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const props = defineProps<{
   battleId: number
 }>();
+
+const toast = useToast()
 
 const gameInfo = ref<GameData>(null as unknown as GameData)
 const teammates = ref<Vehicle[]>([])
@@ -29,6 +34,7 @@ const maxItem = ref(12)
 const isReady = ref(false)
 const duration = ref(0)
 const battleHistory = ref<BattleHistory>(null as unknown as BattleHistory)
+const battleDataResp = ref(null as unknown as BattleResponse)
 
 const playersDamageChartData: Ref<any> = ref({
   labels: [],
@@ -85,11 +91,68 @@ onMounted(async () => {
     enemies.value = sortShip(playersInfo.filter(item => item.relation === 2))
     maxItem.value = Math.max(teammates.value.length, enemies.value.length)
     gameInfo.value = gameData
+
     isReady.value = true
-    playersDamageChartData.value.labels = playersInfo.map(item => item.name)
-    playersDamageChartData.value.datasets[0].data = randomGenerateDateByNumber(playersInfo.length)
-    playersExpChartData.value.labels = playersInfo.map(item => item.name)
-    playersExpChartData.value.datasets[0].data = randomGenerateDateByNumber(playersInfo.length).sort((a,b) => b-a)
+
+    let params: BattleDataRequest = {
+      battle_id: "",
+      battle_type: "pvp",
+      teammate_server: battleHistory.value.teammate_server,
+      teammates: teammates.value.map(item => {
+        return {
+          id: item.id,
+          ship_id: item.shipId,
+          name: item.name,
+        }
+      }),
+      enemy_server: battleHistory.value.enemy_server,
+      enemies: enemies.value.map(item => {
+        return {
+          id: item.id,
+          ship_id: item.shipId,
+          name: item.name,
+        }
+      }),
+    }
+
+    fetchBattleData(params).then((resp) => {
+      if (resp) {
+        battleDataResp.value = resp
+      } else {
+        toast.add({
+          title: "获取数据失败，可能是服务器错误，请检查服务器设置",
+        })
+        return
+      }
+      const playerDMGDataset = playersInfo.map(item => {
+        return {
+          id: item.id,
+          ship_id: item.shipId,
+          name: item.name,
+          damage: (battleDataResp.value.data.battle_data.find(i => i.id === item.id)??defaultBattleData).user_profile.dmg,
+        }
+      }).sort((a,b) => b.damage - a.damage)
+
+      const playerEXPDataset = playersInfo.map(item => {
+        return {
+          id: item.id,
+          ship_id: item.shipId,
+          name: item.name,
+          exp: (battleDataResp.value.data.battle_data.find(i => i.id === item.id)??defaultBattleData).user_profile.exp,
+        }
+      }).sort((a,b) => b.exp - a.exp)
+
+      playersDamageChartData.value.labels = playerDMGDataset.map(item => item.name)
+      playersDamageChartData.value.datasets[0].data = playerDMGDataset.map(item => item.damage)
+
+      playersExpChartData.value.labels = playerEXPDataset.map(item => item.name)
+      playersExpChartData.value.datasets[0].data = playerEXPDataset.map(item => item.exp)
+    }).catch((err) => {
+      toast.add({
+        title: "获取数据失败，可能是服务器错误，如果多次错误请联系作者",
+      })
+      console.log(err)
+    })
   }
   useIntervalFn(async () => {
     if (gameInfo.value) {
@@ -97,15 +160,6 @@ onMounted(async () => {
     }
   }, 1000)
 })
-
-
-function randomGenerateDateByNumber(n: number): number[] {
-  let result: number[] = []
-  for (let i = 0; i < n; i++) {
-    result.push(Math.floor(Math.random() * 10000))
-  }
-  return result
-}
 </script>
 
 <template>
@@ -133,6 +187,7 @@ function randomGenerateDateByNumber(n: number): number[] {
         <div class="max-w-full">
           <div class="columns-2 p-4 gap-10">
             <div class="flex justify-center">
+              <div>WIP</div>
               <Bar :data="playersDamageChartData" :options="chartOptions" class="h-96" />
             </div>
             <div class="flex justify-center">
@@ -160,7 +215,7 @@ function randomGenerateDateByNumber(n: number): number[] {
         <div class="columns-2 p-4 gap-2">
           <div>
             <div v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
-              <TeammateCard :playerInfo="item" :server="battleHistory.teammate_server"/>
+              <TeammateCard :playerInfo="item" :server="battleHistory.teammate_server" :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
             </div>
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
@@ -172,7 +227,7 @@ function randomGenerateDateByNumber(n: number): number[] {
           </div>
           <div>
             <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1 flex justify-start">
-              <EnemyCard :playerInfo="item" :server="battleHistory.enemy_server" />
+              <EnemyCard :playerInfo="item" :server="battleHistory.enemy_server" :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData" />
             </div>
             <template v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">

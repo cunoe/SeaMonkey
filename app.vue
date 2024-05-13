@@ -7,7 +7,6 @@ import parseDatetime from "~/utils/parse.datetime";
 import convertMatchGroup from "~/utils/convert.matchgroup";
 
 import type {GameData, Vehicle} from "~/types/GameData";
-import {saveBattleHistory} from "~/composables/store/battle_history";
 
 
 import { SettingsNeededSettingsModal } from '#components';
@@ -126,6 +125,8 @@ onMounted(async () => {
         })
   }, 5000)
 })
+
+
 
 </script>
 
