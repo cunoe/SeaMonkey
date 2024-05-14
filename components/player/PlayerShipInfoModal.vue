@@ -311,11 +311,11 @@ function getFRColorFromUtil(fr: number) {
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">占领贡献</p>
-                      <p class="text-end">{{shipData.data.info.captuer_contribution}}</p>
+                      <p class="text-end">{{shipData.data.info.captuer_contribution}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">防御贡献</p>
-                      <p class="text-end">{{shipData.data.info.defense_contribution}}</p>
+                      <p class="text-end">{{shipData.data.info.defense_contribution}}%</p>
                     </div>
                   </div>
                   <div class="">
