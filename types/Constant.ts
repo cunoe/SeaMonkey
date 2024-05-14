@@ -1,7 +1,8 @@
 export const SupportedServerList: string[] = [
     'asia',
     'eu',
-    'na'
+    'na',
+    'cn'
 ];
 
 export const RatingColor: {[key: string]: string} = {

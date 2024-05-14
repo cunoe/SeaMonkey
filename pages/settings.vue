@@ -32,6 +32,10 @@ const server = [
   {
     id: 'eu',
     label: '欧服'
+  },
+  {
+    id: 'cn',
+    label: '国服'
   }
 ]
 
@@ -51,6 +55,10 @@ const clanEnemyServer = [
   {
     id: 'eu',
     label: '欧服'
+  },
+  {
+    id: 'cn',
+    label: '国服'
   }
 ]
 
