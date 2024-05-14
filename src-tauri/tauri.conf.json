@@ -9,7 +9,7 @@
   },
   "package": {
     "productName": "sea-monkey",
-    "version": "0.0.6"
+    "version": "0.0.7"
   },
   "tauri": {
     "allowlist": {
@@ -59,7 +59,7 @@
     },
     "updater": {
       "active": true,
-      "endpoints": ["https://github.com/cunoe/SeaMonkey/releases/download/v0.0.7/latest.json"],
+      "endpoints": ["https://github.com/cunoe/SeaMonkey/releases/download/v0.0.8/latest.json"],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMyMTU3MDAwQzZCMzI5NkQKUldSdEtiUEdBSEFWTXFQZ0RNWWJPRlpSaUFJR3loUjVKWmtGV0c0Um1mR3Z6M0pHb2hFRWViY00K"
     },
