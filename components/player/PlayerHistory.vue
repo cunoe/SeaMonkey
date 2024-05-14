@@ -26,7 +26,7 @@ const props = defineProps<{
 
 const toast = useToast()
 
-const info = ref('正在解析数据，请稍后')
+const screenInfo = ref('正在解析数据，请稍后')
 const gameInfo = ref<GameData>(null as unknown as GameData)
 const teammates = ref<Vehicle[]>([])
 const enemies = ref<Vehicle[]>([])
@@ -93,8 +93,6 @@ onMounted(async () => {
     maxItem.value = Math.max(teammates.value.length, enemies.value.length)
     gameInfo.value = gameData
 
-    isReady.value = true
-
     let battleType = 'pvp'
     if (gameData.matchGroup.toUpperCase() === 'RANKED') {
       battleType = 'rank'
@@ -146,11 +144,12 @@ onMounted(async () => {
 
       playersExpChartData.value.labels = playerEXPDataset.map(item => item.name)
       playersExpChartData.value.datasets[0].data = playerEXPDataset.map(item => item.exp)
+      isReady.value = true
     }).catch((err) => {
       toast.add({
         title: "获取数据失败：" + err.message,
       })
-      info.value = '获取数据失败：' + err.message
+      screenInfo.value = '获取数据失败：' + err.message
       console.log(err)
     })
   }
@@ -172,7 +171,7 @@ onMounted(async () => {
               class="w-3/5 rounded-lg shadow-sm p-5 border-dashed border border-blue-500 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-0 text-center">
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
               <div class="text-center">
-                <div class="stat-value text-3xl">{{info}}</div>
+                <div class="stat-value text-3xl">{{screenInfo}}</div>
                 <span class="loading loading-infinity loading-lg"></span>
               </div>
             </div>
