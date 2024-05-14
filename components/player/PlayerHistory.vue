@@ -26,6 +26,7 @@ const props = defineProps<{
 
 const toast = useToast()
 
+const info = ref('正在解析数据，请稍后')
 const gameInfo = ref<GameData>(null as unknown as GameData)
 const teammates = ref<Vehicle[]>([])
 const enemies = ref<Vehicle[]>([])
@@ -144,6 +145,7 @@ onMounted(async () => {
       toast.add({
         title: "获取数据失败：" + err.message,
       })
+      info.value = '获取数据失败：' + err.message
       console.log(err)
     })
   }
@@ -165,7 +167,7 @@ onMounted(async () => {
               class="w-3/5 rounded-lg shadow-sm p-5 border-dashed border border-blue-500 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-0 text-center">
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
               <div class="text-center">
-                <div class="stat-value text-3xl">正在解析数据，请稍后</div>
+                <div class="stat-value text-3xl">{{info}}</div>
                 <span class="loading loading-infinity loading-lg"></span>
               </div>
             </div>
@@ -188,7 +190,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <GameStats :duration="duration" :gameData="gameInfo" :player="player" />
+        <GameStats :duration="duration" :gameData="gameInfo" :player="player" :battle-data="battleDataResp" />
         <div class="flex justify-center">
           <div class="stats container">
             <div class="stat text-center">

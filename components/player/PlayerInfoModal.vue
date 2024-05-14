@@ -102,7 +102,7 @@ function getFRColorFromUtil(fr: number) {
               </div>
             </div>
             <div v-if="isReady">
-              <div class="flex flex-row bg-fuchsia-600 text-white text-xl rounded-lg font-bold text-center justify-center items-center">
+              <div class="flex flex-row text-white text-xl rounded-lg font-bold text-center justify-center items-center"  :style="{backgroundColor: getPRColorFromUtil(playerData.data.bt.pvp_solo.pr)}">
                 {{getPersonalRateData(playerData.data.pr.pr).name}} {{playerData.data.pr.pr}}
               </div>
               <div class="p-1"></div>

@@ -149,8 +149,8 @@ function getFRColorFromUtil(fr: number) {
                 </div>
               </div>
               <div v-if="isReady">
-                <div class="flex flex-row bg-fuchsia-600 text-white text-xl rounded-lg font-bold text-center justify-center items-center">
-                  <!--                {{getPersonalRateData(shipData.data.pr.pr).name}} {{shipData.data.pr.pr}}-->
+                <div class="flex flex-row text-white text-xl rounded-lg font-bold text-center justify-center items-center"  :style="{backgroundColor: getPRColorFromUtil(shipData.data.pr.pr)}">
+                  {{getPersonalRateData(shipData.data.pr.pr).name}} {{shipData.data.pr.pr}}
                 </div>
                 <div class="p-1"></div>
                 <div class="flex justify-center">

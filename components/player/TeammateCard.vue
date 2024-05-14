@@ -55,15 +55,17 @@ function getClanColorFromUtil(clanType: number) {
           <div class="flex flex-row gap-1">
             <div class="badge font-bold" :style="{backgroundColor: getWRColorFromUtil(battleData.user_profile.wr)}">胜率 {{battleData.user_profile.wr.toFixed()}}%</div>
             <div class="badge font-bold" :style="{backgroundColor: getPRColorFromUtil(battleData.user_profile.pr)}">评分 {{battleData.user_profile.pr}}</div>
+            <div class="badge font-bold" :style="{backgroundColor: getBLTColorFromUtil(battleData.user_profile.blt)}">场次 {{battleData.ship_profile.blt}}</div>
           </div>
           <div class="flex flex-row gap-1">
             <div class="badge font-bold" :style="{backgroundColor: getDMGColorFromUtil(battleData.user_profile.dmg, '')}">伤害 {{battleData.user_profile.dmg}}</div>
             <div class="badge font-bold" :style="{backgroundColor: getExpColorFromUtil(battleData.user_profile.exp)}">经验 {{battleData.user_profile.exp}}</div>
+            <div class="badge font-bold" :style="{backgroundColor: getFRColorFromUtil(battleData.user_profile.fr)}">击杀 {{battleData.ship_profile.fr}}</div>
           </div>
         </div>
       </a>
       <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
-        <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[26rem] hover-scale">
+        <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[22rem] hover-scale">
           <div class="absolute right-4 top-4 text-end">
             <h2 class="text-white font-bold text-xl">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>
             <div class="flex flex-row gap-1 justify-end">
