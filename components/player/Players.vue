@@ -207,7 +207,8 @@ useIntervalFn(async () => {
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
                 <div class="p-1">
-                  <div class="p-12"></div>
+                  <div v-if="isDetail" class="p-12"></div>
+                  <div v-if="!isDetail" class="p-6"></div>
                 </div>
               </template>
             </template>
@@ -227,7 +228,8 @@ useIntervalFn(async () => {
             <template v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">
                 <div class="p-1">
-                  <div class="p-12"></div>
+                  <div v-if="isDetail" class="p-12"></div>
+                  <div v-if="!isDetail" class="p-6"></div>
                 </div>
               </template>
             </template>
