@@ -16,6 +16,9 @@
       "dialog": {
         "open": true
       },
+      "shell": {
+        "open": true
+      },
       "path": {
         "all": true
       }
