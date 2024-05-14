@@ -90,12 +90,23 @@ function getHeaders(): Headers {
     return headers;
 }
 
+// 删除机器人用户 一般是以 : 开头的用户
+function filterBotUser(data: BattleDataRequest): BattleDataRequest{
+    const teammates = data.teammates.filter(teammate => !teammate.name.startsWith(':'));
+    const enemies = data.enemies.filter(enemy => !enemy.name.startsWith(':'));
+    return {
+        ...data,
+        teammates,
+        enemies
+    }
+}
+
 export async function fetchBattleData(data: BattleDataRequest): Promise<BattleDataResponse> {
     const url = 'http://www.wows-coral.com:8000/w/brief/';
     const response = await fetch(url, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify(data)
+        body: JSON.stringify(filterBotUser(data))
     });
 
     if (response.status === 200) {

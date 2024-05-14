@@ -95,9 +95,14 @@ onMounted(async () => {
 
     isReady.value = true
 
+    let battleType = 'pvp'
+    if (gameData.matchGroup.toUpperCase() === 'RANKED') {
+      battleType = 'rank'
+    }
+
     let params: BattleDataRequest = {
       battle_id: "",
-      battle_type: "pvp",
+      battle_type: battleType,
       teammate_server: battleHistory.value.teammate_server,
       teammates: teammates.value.map(item => {
         return {

@@ -39,7 +39,7 @@ function getClanColorFromUtil(clanType: number) {
   return getClanColor(clanType)
 }
 function getClan(){
-  if (props.battleData.clan === null) return ""
+  if (props.battleData.clan === null || props.battleData.clan === '') return ""
   return `[${props.battleData.clan}]`
 }
 </script>

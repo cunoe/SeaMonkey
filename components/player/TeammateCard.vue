@@ -38,7 +38,7 @@ function getFRColorFromUtil(fr: number) {
 
 
 function getClan(){
-  if (props.battleData.clan === null) return ""
+  if (props.battleData.clan === null || props.battleData.clan === '') return ""
   return `[${props.battleData.clan}]`
 }
 function getClanColorFromUtil(clanType: number) {
