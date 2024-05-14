@@ -17,10 +17,10 @@ const props = defineProps<{
   battleData: BattleData
 }>();
 
-function getPRColor(pr: number) {
+function getPRColorFromUtil(pr: number) {
   return getPersonalRateData(pr).color;
 }
-function getWRColor(wr: number) {
+function getWRColorFromUtil(wr: number) {
   return getWinRateColor(wr)
 }
 function getExpColorFromUtil(exp: number){
@@ -41,18 +41,20 @@ function getClan(){
   if (props.battleData.clan === null) return ""
   return `[${props.battleData.clan}]`
 }
-
+function getClanColorFromUtil(clanType: number) {
+  return getClanColor(clanType)
+}
 </script>
 
 <template>
   <div>
     <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-12">
-      <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
+      <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
         <div class="absolute left-4 top-4 leading-loose hover-scale">
-          <h2 class="text-white font-bold text-xl">{{getClan()}}{{ playerInfo.name }}</h2>
+          <div class="text-white font-bold text-xl join"><p :style="{color: getClanColorFromUtil(battleData.clan_type)}">{{getClan()}}</p><p>{{ playerInfo.name }}</p></div>
           <div class="flex flex-row gap-1">
-            <div class="badge font-bold" :style="{backgroundColor: getWRColor(battleData.user_profile.wr)}">胜率 {{battleData.user_profile.wr.toFixed()}}%</div>
-            <div class="badge font-bold" :style="{backgroundColor: getPRColor(battleData.user_profile.pr)}">评分 {{battleData.user_profile.pr}}</div>
+            <div class="badge font-bold" :style="{backgroundColor: getWRColorFromUtil(battleData.user_profile.wr)}">胜率 {{battleData.user_profile.wr.toFixed()}}%</div>
+            <div class="badge font-bold" :style="{backgroundColor: getPRColorFromUtil(battleData.user_profile.pr)}">评分 {{battleData.user_profile.pr}}</div>
           </div>
           <div class="flex flex-row gap-1">
             <div class="badge font-bold" :style="{backgroundColor: getDMGColorFromUtil(battleData.user_profile.dmg, '')}">伤害 {{battleData.user_profile.dmg}}</div>
@@ -60,14 +62,14 @@ function getClan(){
           </div>
         </div>
       </a>
-      <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server})" class="text-white/50 cursor-pointer font-bold">
+      <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
         <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[26rem] hover-scale">
           <div class="absolute right-4 top-4 text-end">
             <h2 class="text-white font-bold text-xl">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>
             <div class="flex flex-row gap-1 justify-end">
               <div class="badge font-bold" :style="{backgroundColor: getBLTColorFromUtil(battleData.ship_profile.blt)}">场次 {{battleData.ship_profile.blt}}</div>
-              <div class="badge font-bold" :style="{backgroundColor: getPRColor(battleData.ship_profile.pr)}">评分 {{battleData.ship_profile.pr}}</div>
-              <div class="badge font-bold" :style="{backgroundColor: getWRColor(battleData.ship_profile.wr)}">胜率 {{battleData.ship_profile.wr.toFixed()}}%</div>
+              <div class="badge font-bold" :style="{backgroundColor: getPRColorFromUtil(battleData.ship_profile.pr)}">评分 {{battleData.ship_profile.pr}}</div>
+              <div class="badge font-bold" :style="{backgroundColor: getWRColorFromUtil(battleData.ship_profile.wr)}">胜率 {{battleData.ship_profile.wr.toFixed()}}%</div>
             </div>
             <div class="flex flex-row gap-1 justify-end">
               <div class="badge font-bold" :style="{backgroundColor: getFRColorFromUtil(battleData.ship_profile.fr)}">击杀 {{battleData.ship_profile.fr}}</div>

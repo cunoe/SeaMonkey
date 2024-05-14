@@ -14,7 +14,7 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 import convertServerToLocale from "../../utils/convert.server";
 import {
   type BattleDataRequest,
-  type BattleResponse,
+  type BattleDataResponse,
   defaultBattleData,
   fetchBattleData
 } from "~/composables/requests/kokomi";
@@ -34,7 +34,7 @@ const maxItem = ref(12)
 const isReady = ref(false)
 const duration = ref(0)
 const battleHistory = ref<BattleHistory>(null as unknown as BattleHistory)
-const battleDataResp = ref(null as unknown as BattleResponse)
+const battleDataResp = ref(null as unknown as BattleDataResponse)
 
 const playersDamageChartData: Ref<any> = ref({
   labels: [],
@@ -116,14 +116,7 @@ onMounted(async () => {
     }
 
     fetchBattleData(params).then((resp) => {
-      if (resp) {
-        battleDataResp.value = resp
-      } else {
-        toast.add({
-          title: "获取数据失败，可能是服务器错误，请检查服务器设置",
-        })
-        return
-      }
+      battleDataResp.value = resp
       const playerDMGDataset = playersInfo.map(item => {
         return {
           id: item.id,
@@ -149,7 +142,7 @@ onMounted(async () => {
       playersExpChartData.value.datasets[0].data = playerEXPDataset.map(item => item.exp)
     }).catch((err) => {
       toast.add({
-        title: "获取数据失败，可能是服务器错误，如果多次错误请联系作者",
+        title: "获取数据失败：" + err.message,
       })
       console.log(err)
     })
