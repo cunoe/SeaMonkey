@@ -8,6 +8,7 @@ import getWinRateColor from "~/utils/get.wr.color";
 import getDMGColor from "~/utils/get.dmg.color";
 import getBLTColor from "~/utils/get.blt.color";
 import getFRColor from "~/utils/get.fr.color";
+import {getKV, saveKV} from "~/composables/store/kv";
 
 const props = defineProps<{
   player: Vehicle,
@@ -22,6 +23,8 @@ const info = ref('正在获取数据...')
 const emit = defineEmits(['success'])
 const isReady = ref(false)
 
+const isMarked = ref(false)
+
 const playerData = ref(null as unknown as PlayerDataResponse)
 
 function onSuccess() {
@@ -29,7 +32,16 @@ function onSuccess() {
   emit('success')
 }
 
+watch(isMarked,  () => {
+    saveKV(`marked_player_${props.playerServer}_${props.battleData.aid}`, isMarked.value.toString())
+})
+
 onBeforeMount(() => {
+  getKV(`marked_player_${props.playerServer}_${props.battleData.aid}`).then((res) => {
+    isMarked.value = res === 'true'
+  }).catch(() => {
+    isMarked.value = false
+  })
   fetchPlayerData({aid: props.battleData.aid.toString(), server: props.playerServer}).then(res => {
     playerData.value = res
     isReady.value = true
@@ -78,12 +90,17 @@ function getFRColorFromUtil(fr: number) {
               <div>
                 <div class="text-xl font-bold join">
                   <p class="join" :style="{color: getClanColorFromUtil(battleData.clan_type)}">{{getClan()}}</p>
-                  {{ player.name }}
+                  <p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p>
+                  <p :class="{'text-orange-600': isMarked, '': !isMarked}">{{ player.name }}</p>
+                  <p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p>
                   <div class="badge badge-neutral">
                     {{ convertServerToLocale(playerServer, '') }}
                   </div>
                 </div>
               </div>
+            <div class="flex flex-row space-x-2 justify-end items-end">
+              <p>标记玩家</p><input type="checkbox" class="toggle" checked  v-model="isMarked"/>
+            </div>
           </div>
           <div class="space-y-4">
             <div v-if="!isReady">

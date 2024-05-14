@@ -7,10 +7,20 @@ import getWinRateColor from "~/utils/get.wr.color";
 import getDMGColor from "~/utils/get.dmg.color";
 import getBLTColor from "~/utils/get.blt.color";
 import getFRColor from "~/utils/get.fr.color";
+import {useIntervalFn} from "@vueuse/core";
+import {getKV} from "~/composables/store/kv";
 
 const modal = useModal();
 const toast = useToast();
+const isMarked = ref(false)
 
+useIntervalFn(() => {
+  getKV(`marked_player_${props.server}_${props.battleData.aid}`).then((res) => {
+    isMarked.value = res === 'true'
+  }).catch(() => {
+    isMarked.value = false
+  })
+}, 1000)
 const props = defineProps<{
   playerInfo: Vehicle
   server: string
@@ -49,7 +59,9 @@ function getClan(){
     <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-6">
       <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
         <div class="absolute right-4 top-2.5 leading-loose text-end hover-scale">
-          <div class="text-white font-bold text-xl join"><p>{{ playerInfo.name }}</p><p :style="{color: getClanColorFromUtil(battleData.clan_type)}">{{getClan()}}</p></div>
+          <div class="text-white font-bold text-xl join"><p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p>
+            <p :class="{'text-orange-600': isMarked, '': !isMarked}">{{ playerInfo.name }}</p>
+            <p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p><p :style="{color: getClanColorFromUtil(battleData.clan_type)}">{{getClan()}}</p></div>
         </div>
       </a>
       <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
