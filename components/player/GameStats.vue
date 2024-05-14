@@ -75,25 +75,46 @@ function getWRColor(wr: number) {
 
 <template>
   <div class="flex flex-col items-center justify-center">
+<!--    <div class="stats container">-->
+<!--      <div class="stat text-center">-->
+<!--        <div class="stat-title">游戏模式</div>-->
+<!--        <div class="stat-value">{{convertMatchGroup(gameData.matchGroup).name}} {{gameData.name}}</div>-->
+<!--      </div>-->
+<!--      <div class="stat text-center">-->
+<!--        <div class="stat-title">对战地图</div>-->
+<!--        <div class="stat-value">{{convertMapid(gameData.mapId).name}}</div>-->
+<!--      </div>-->
+<!--      <div class="stat text-center">-->
+<!--        <div class="stat-title">距离这一场战斗</div>-->
+<!--        <div class="stat-value">{{ convertSecondsToString(duration) }}</div>-->
+<!--      </div>-->
+<!--      <div class="stat text-center">-->
+<!--        <div class="stat-title">你开的船</div>-->
+<!--        <div class="stat-value">-->
+<!--          {{ player.shipInfo ? numberToRoman(player.shipInfo.tier) : '' }}-->
+<!--          {{ player.shipInfo ? player.shipInfo.ship_name.zh_sg : '不认识这艘船捏' }}-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
     <div class="stats container">
-      <div class="stat text-center">
-        <div class="stat-title">游戏模式</div>
-        <div class="stat-value">{{convertMatchGroup(gameData.matchGroup).name}} {{gameData.name}}</div>
-      </div>
-      <div class="stat text-center">
-        <div class="stat-title">对战地图</div>
-        <div class="stat-value">{{convertMapid(gameData.mapId).name}}</div>
-      </div>
-      <div class="stat text-center">
-        <div class="stat-title">距离这一场战斗</div>
-        <div class="stat-value">{{ convertSecondsToString(duration) }}</div>
-      </div>
       <div class="stat text-center">
         <div class="stat-title">你开的船</div>
         <div class="stat-value">
           {{ player.shipInfo ? numberToRoman(player.shipInfo.tier) : '' }}
           {{ player.shipInfo ? player.shipInfo.ship_name.zh_sg : '不认识这艘船捏' }}
         </div>
+      </div>
+      <div class="stat text-center">
+        <div class="stat-title">玩家平均胜率</div>
+        <div class="stat-value"><p class='join' :style="{color: getWRColor(teammateAvgWR)}">{{teammateAvgWR.toFixed(2)}}%</p> / <p class='join' :style="{color: getWRColor(enemyAvgWR)}">{{enemyAvgWR.toFixed(2)}}%</p></div>
+      </div>
+      <div class="stat text-center">
+        <div class="stat-title">舰船平均胜率</div>
+        <div class="stat-value"><p class='join' :style="{color: getWRColor(teammateAvgShipWR)}">{{teammateAvgShipWR.toFixed(2)}}%</p> / <p class='join' :style="{color: getWRColor(enemyAvgShipWR)}">{{enemyAvgShipWR.toFixed(2)}}%</p></div>
+      </div>
+      <div class="stat text-center">
+        <div class="stat-title">距离这一场战斗</div>
+        <div class="stat-value">{{ convertSecondsToString(duration) }}</div>
       </div>
     </div>
 <!--    <div class="stats container">-->

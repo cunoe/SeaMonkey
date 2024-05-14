@@ -1,9 +1,9 @@
 import {RatingColor} from "~/types/Constant";
 
 export default function getWinRateColor(winRate: number): string {
-    if (winRate > 0 && winRate < 30) {
+    if (winRate > 0 && winRate < 45) {
         return RatingColor['Bad']
-    } else if (winRate >= 30 && winRate < 50) {
+    } else if (winRate >= 45 && winRate < 50) {
         return RatingColor['Average']
     } else if (winRate >= 50 && winRate < 55) {
         return RatingColor['VeryGood']

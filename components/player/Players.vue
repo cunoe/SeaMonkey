@@ -18,6 +18,8 @@ const toast = useToast()
 
 const isDetail = ref(false)
 const isSortedByPr = ref(false)
+const isHiddenStats = ref(false)
+
 const screenInfo = ref('还没有数据哦~请这位窝批，启动！')
 const battleHistory = ref<BattleHistory>(null as unknown as BattleHistory)
 const gameInfo = ref<GameData>(null as unknown as GameData)
@@ -69,6 +71,10 @@ watch(isDetail, () => {
   saveKV('isDetail', isDetail.value.toString())
 })
 
+watch(isHiddenStats, () => {
+  saveKV('isHiddenStats', isHiddenStats.value.toString())
+})
+
 useIntervalFn(async () => {
   let result = await getLatestBattleHistory()
   if (result) {
@@ -89,6 +95,13 @@ useIntervalFn(async () => {
     }).catch(() => {
       isDetail.value = false
     })
+
+    getKV('isHiddenStats').then((res) => {
+      isHiddenStats.value = res === 'true'
+    }).catch(() => {
+      isHiddenStats.value = false
+    })
+
 
     let gameData: GameData = JSON.parse(result.raw_data)
     let playersInfo: Vehicle[] = [];
@@ -181,17 +194,31 @@ useIntervalFn(async () => {
     <div v-if="isReady">
       <div class="p-2" />
       <div class="container max-w-full">
-        <GameStats :duration="duration" :gameData="gameInfo" :player="player" :battle-data="battleDataResp"/>
         <div class="flex flex-row items-center justify-center">
           <div class="stats container">
-            <div class="stat text-center">
-              <div class="stat-value">简洁模式 <input type="checkbox" class="toggle" checked  v-model="isDetail"/> 详细模式</div>
+            <div class="stat text-center text-sm">
+              <div class="flex flex-row stat-value text-xl space-x-2 justify-center items-center">
+                <p>简洁模式</p>
+                <input type="checkbox" class="toggle" checked  v-model="isDetail"/>
+                <p>详细模式</p>
+              </div>
             </div>
-            <div class="stat text-center">
-              <div class="stat-value">舰船排序 <input type="checkbox" class="toggle" checked  v-model="isSortedByPr"/> 评分排序</div>
+            <div class="stat text-center text-sm">
+              <div class="flex flex-row stat-value text-xl space-x-2 justify-center items-center">
+                <p>舰船排序</p>
+                <input type="checkbox" class="toggle" checked  v-model="isSortedByPr"/>
+                <p>评分排序</p>
+              </div>
+            </div>
+            <div class="stat text-center text-2xl">
+              <div class="flex flex-row stat-value text-xl space-x-2 justify-center items-center">
+                <p>隐藏信息</p>
+                <input type="checkbox" class="toggle" checked  v-model="isHiddenStats"/>
+              </div>
             </div>
           </div>
         </div>
+        <GameStats v-if="!isHiddenStats" :duration="duration" :gameData="gameInfo" :player="player" :battle-data="battleDataResp"/>
         <div class="columns-2 p-4 gap-2">
           <div>
             <div v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
