@@ -45,6 +45,10 @@ const server = [{
     label: '欧服'
   },
   {
+    id: 'ru',
+    label: '俄服'
+  },
+  {
     id: 'cn',
     label: '国服'
   }
