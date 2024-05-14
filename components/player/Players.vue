@@ -13,6 +13,7 @@ import type {BattleDataResponse, BattleDataRequest} from "~/composables/requests
 
 const toast = useToast()
 
+const screenInfo = ref('还没有数据哦~请这位窝批，启动！')
 const battleHistory = ref<BattleHistory>(null as unknown as BattleHistory)
 const gameInfo = ref<GameData>(null as unknown as GameData)
 const teammates = ref<Vehicle[]>([])
@@ -34,6 +35,9 @@ useIntervalFn(async () => {
     if (result.timestamp === timestamp.value && result.teammate_server === teammateServer.value && result.enemy_server === enemyServer.value) {
       return
     }
+    screenInfo.value = '正在解析数据，请稍后'
+    isReady.value = false
+
     let gameData: GameData = JSON.parse(result.raw_data)
     let playersInfo: Vehicle[] = [];
     for (let i = 0; i < gameData.vehicles.length; i++) {
@@ -77,20 +81,21 @@ useIntervalFn(async () => {
         }
       }),
     }
-    fetchBattleData(params).then((resp) => {
-        battleDataResp.value = resp
+    screenInfo.value = '正在请求数据，请稍后'
+    await fetchBattleData(params).then((resp) => {
+       battleDataResp.value = resp
+       isReady.value = true
     }).catch((err) => {
       toast.add({
         title: "获取数据失败：" + err.message,
       })
+      screenInfo.value = '获取数据失败' + err.message
       console.log(err)
     })
 
     timestamp.value = result.timestamp
     teammateServer.value = result.teammate_server
     enemyServer.value = result.enemy_server
-
-    isReady.value = true
   }
 }, 5000)
 useIntervalFn(async () => {
@@ -111,7 +116,7 @@ useIntervalFn(async () => {
               class="w-3/5 rounded-lg shadow-sm p-5 border-dashed border border-blue-500 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-0 text-center">
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
               <div class="text-center">
-                <div class="stat-value text-3xl">还没有数据哦~请这位窝批，启动！</div>
+                <div class="stat-value text-3xl">{{ screenInfo }}</div>
                 <span class="loading loading-infinity loading-lg"></span>
               </div>
             </div>

@@ -119,7 +119,8 @@ onMounted(async () => {
       }),
     }
 
-    fetchBattleData(params).then((resp) => {
+    screenInfo.value = '正在请求数据，请稍后'
+    await fetchBattleData(params).then((resp) => {
       battleDataResp.value = resp
       const playerDMGDataset = playersInfo.map(item => {
         return {
