@@ -7,27 +7,59 @@ use std::path::Path;
 use regex::Regex;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
+// fn main() {
+//     
+//     tauri::Builder::default()
+//         .plugin(tauri_plugin_sql::Builder::default()
+//             .add_migrations("sqlite:data.db", migrations)
+//             .build())
+//         .invoke_handler(tauri::generate_handler![get_replays_temp_info, get_selected_realm])
+//         .run(tauri::generate_context!())
+//         .expect("error while running tauri application");
+// }
+
+use tauri::{utils::config::AppUrl, window::WindowBuilder, WindowUrl};
+
 fn main() {
+    let port = portpicker::pick_unused_port().expect("failed to find unused port");
+
+    let mut context = tauri::generate_context!();
+    let url = format!("http://localhost:{}", port).parse().unwrap();
+    let window_url = WindowUrl::External(url);
+    // rewrite the config so the IPC is enabled on this URL
+    context.config_mut().build.dist_dir = AppUrl::Url(window_url.clone());
+
     let migrations = vec![
-            Migration {
-                version: 1,
-                description: "kv_database",
-                sql: "CREATE TABLE properties (key TEXT PRIMARY KEY, value TEXT);",
-                kind: MigrationKind::Up,
-            },
-            Migration {
-                version: 2,
-                description: "game_battle_history",
-                sql: "CREATE TABLE battle_history (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp INTEGER UNIQUE, start_time TIMESTAMP, kokomi_battle_id INTEGER, match_group TEXT, game_mode INTEGER, map_display_name TEXT, map_id INTEGER, players_per_team INTEGER, teams_count INTEGER, duration INTEGER, player_name TEXT, player_vehicle TEXT, scenario TEXT, teammate_server TEXT, enemy_server TEXT, tire INTEGER, raw_data TEXT);",
-                kind: MigrationKind::Up,
-            }
-        ];
+        Migration {
+            version: 1,
+            description: "kv_database",
+            sql: "CREATE TABLE properties (key TEXT PRIMARY KEY, value TEXT);",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "game_battle_history",
+            sql: "CREATE TABLE battle_history (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp INTEGER UNIQUE, start_time TIMESTAMP, kokomi_battle_id INTEGER, match_group TEXT, game_mode INTEGER, map_display_name TEXT, map_id INTEGER, players_per_team INTEGER, teams_count INTEGER, duration INTEGER, player_name TEXT, player_vehicle TEXT, scenario TEXT, teammate_server TEXT, enemy_server TEXT, tire INTEGER, raw_data TEXT);",
+            kind: MigrationKind::Up,
+        }
+    ];
+
     tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::default()
             .add_migrations("sqlite:data.db", migrations)
             .build())
         .invoke_handler(tauri::generate_handler![get_replays_temp_info, get_selected_realm])
-        .run(tauri::generate_context!())
+        .plugin(tauri_plugin_localhost::Builder::new(port).build())
+        .setup(move |app| {
+            WindowBuilder::new(app, "main".to_string(), window_url)
+                .title("SeaMonkey - 谁是海猴？")
+                .fullscreen(false)
+                .resizable(true)
+                .min_inner_size(1440f64, 800f64)
+                .build()?;
+            Ok(())
+        })
+        .run(context)
         .expect("error while running tauri application");
 }
 

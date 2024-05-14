@@ -173,6 +173,10 @@ export interface ShipTypeDetail {
 }
 
 export async function fetchPlayerData(data: PlayerDataRequest): Promise<PlayerDataResponse> {
+    if (data.aid === '0') {
+        throw new Error(`请求无效`);
+    }
+    
     const url = `http://www.wows-coral.com:8000/w/user-detail?aid=${data.aid}&server=${data.server}`;
     const response = await fetch(url, {
         method: 'GET',
@@ -241,6 +245,10 @@ export interface ShipDetailInfo {
 }
 
 export async function fetchShipData(data: ShipDataRequest): Promise<ShipDataResponse> {
+    if (data.ship_id === 0 || data.aid === '0') {
+        throw new Error(`请求无效`);
+    }
+    
     const url = `http://www.wows-coral.com:8000/w/ship-detail?aid=${data.aid}&server=${data.server}&ship_id=${data.ship_id}`;
     const response = await fetch(url, {
         method: 'GET',

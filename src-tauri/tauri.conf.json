@@ -66,16 +66,6 @@
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMyMTU3MDAwQzZCMzI5NkQKUldSdEtiUEdBSEFWTXFQZ0RNWWJPRlpSaUFJR3loUjVKWmtGV0c0Um1mR3Z6M0pHb2hFRWViY00K"
     },
-    "windows": [
-      {
-        "fullscreen": false,
-        "height": 800,
-        "resizable": true,
-        "title": "SeaMonkey - 谁是海猴？",
-        "width": 1440,
-        "minHeight": 800,
-        "minWidth": 1440
-      }
-    ]
+    "windows": []
   }
 }
