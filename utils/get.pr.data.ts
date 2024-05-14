@@ -45,7 +45,7 @@ const ratingData : RatingData[] =  [
         "nextValue": 0,
         "name": "还需努力",
         "englishName": "Bad",
-        "color": "#FE0E00"
+        "color": "#b30000"
     },
     {
         "code": 2,
@@ -69,7 +69,7 @@ const ratingData : RatingData[] =  [
         "nextValue": 0,
         "name": "好",
         "englishName": "Good",
-        "color": "#44B300"
+        "color": "#3a9a00"
     },
     {
         "code": 5,
@@ -85,7 +85,7 @@ const ratingData : RatingData[] =  [
         "nextValue": 0,
         "name": "非常好",
         "englishName": "Great",
-        "color": "#02C9B3"
+        "color": "#02b09d"
     },
     {
         "code": 7,
