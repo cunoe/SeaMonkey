@@ -1,17 +1,19 @@
+import {RatingColor} from "~/types/Constant";
+
 export default function getExpColor(exp: number): string {
     if (exp > 0 && exp < 500) {
-        return "#FE0E00"
+        return RatingColor['Bad']
     } else if (exp >= 500 && exp < 800) {
-        return "#D29D00"
+        return RatingColor['Average']
     } else if (exp >= 800 && exp < 1200) {
-        return "#44B300"
+        return RatingColor['VeryGood']
     } else if (exp >= 1200 && exp < 1600) {
-        return "#02C9B3"
+        return RatingColor['Great']
     } else if (exp >= 1600 && exp < 2000) {
-        return "#D042F3"
+        return RatingColor['Unicum']
     } else if (exp >= 2000){
-        return "#A00DC5"
+        return RatingColor['SuperUnicum']
     } else {
-        return "#828282"
+        return RatingColor['None']
     }
 }

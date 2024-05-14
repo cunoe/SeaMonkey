@@ -1,15 +1,17 @@
+import {RatingColor} from "~/types/Constant";
+
 export default function getBLTColor(blt: number): string {
     if (blt >= 500 && blt < 2000) {
-        return "#D29D00"
+        return RatingColor['Average']
     } else if (blt >= 2000 && blt < 4000) {
-        return "#44B300"
+        return RatingColor['VeryGood']
     } else if (blt >= 4000 && blt < 10000) {
-        return "#02C9B3"
+        return RatingColor['Great']
     } else if (blt >= 10000 && blt < 20000) {
-        return "#D042F3"
+        return RatingColor['Unicum']
     } else if (blt >= 20000){
-        return "#A00DC5"
+        return RatingColor['SuperUnicum']
     } else {
-        return "#828282"
+        return RatingColor['None']
     }
 }

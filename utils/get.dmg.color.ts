@@ -1,79 +1,74 @@
-export default function getDMGColor(dmg: number, shipType: string): string {
-    const color_data: {[key: string]: string} = {
-        'Bad': '#FE0E00',
-        'Good': '#318000',
-        'Great': '#02C9B3',
-        'Unicum': '#D042F3',
-        'Super Unicum': '#A00DC5'
-    };
+import {RatingColor} from "~/types/Constant";
 
-    if (dmg === 0){return '#828282'}
+export default function getDMGColor(dmg: number, shipType: string): string {
+
+    if (dmg === 0){return RatingColor['None']}
 
     try {
         if (shipType === 'Destroyer' || shipType === 'Submarine') {
             if (!dmg || dmg < 33000) {
-                return color_data['Bad'];
+                return RatingColor['Bad'];
             } else if (dmg < 40000) {
-                return color_data['Good'];
+                return RatingColor['Good'];
             } else if (dmg < 55000) {
-                return color_data['Great'];
+                return RatingColor['Great'];
             } else if (dmg < 64000) {
-                return color_data['Unicum'];
+                return RatingColor['Unicum'];
             } else {
-                return color_data['Super Unicum'];
+                return RatingColor['SuperUnicum'];
             }
         } else if (shipType === 'Cruiser') {
             if (!dmg || dmg < 47000) {
-                return color_data['Bad'];
+                return RatingColor['Bad'];
             } else if (dmg < 55000) {
-                return color_data['Good'];
+                return RatingColor['Good'];
             } else if (dmg < 83000) {
-                return color_data['Great'];
+                return RatingColor['Great'];
             } else if (dmg < 95000) {
-                return color_data['Unicum'];
+                return RatingColor['Unicum'];
             } else {
-                return color_data['Super Unicum'];
+                return RatingColor['SuperUnicum'];
             }
         } else if (shipType === 'AirCarrier') {
             if (!dmg || dmg < 60000) {
-                return color_data['Bad'];
+                return RatingColor['Bad'];
             } else if (dmg < 71000) {
-                return color_data['Good'];
+                return RatingColor['Good'];
             } else if (dmg < 84000) {
-                return color_data['Great'];
+                return RatingColor['Great'];
             } else if (dmg < 113000) {
-                return color_data['Unicum'];
+                return RatingColor['Unicum'];
             } else {
-                return color_data['Super Unicum'];
+                return RatingColor['SuperUnicum'];
             }
         } else if (shipType === 'Battleship') {
             if (!dmg || dmg < 64000) {
-                return color_data['Bad'];
+                return RatingColor['Bad'];
             } else if (dmg < 72000) {
-                return color_data['Good'];
+                return RatingColor['Good'];
             } else if (dmg < 97000) {
-                return color_data['Great'];
+                return RatingColor['Great'];
             } else if (dmg < 108000) {
-                return color_data['Unicum'];
+                return RatingColor['Unicum'];
             } else {
-                return color_data['Super Unicum'];
+                return RatingColor['SuperUnicum'];
             }
         } else {
             if (!dmg || dmg < 64000) {
-                return color_data['Bad'];
+                return RatingColor['Bad'];
             } else if (dmg < 72000) {
-                return color_data['Good'];
+                return RatingColor['Good'];
             } else if (dmg < 97000) {
-                return color_data['Great'];
+                return RatingColor['Great'];
             } else if (dmg < 108000) {
-                return color_data['Unicum'];
+                return RatingColor['Unicum'];
             } else {
-                return color_data['Super Unicum'];
+                return RatingColor['SuperUnicum'];
             }
         }
     } catch (error) {
         console.error(error);
     }
 
-    return "#828282";
+    return RatingColor['None'];
 }
