@@ -43,19 +43,19 @@ function SortByPr() {
         ...item,
         ship_profile: battleDataResp.value.data.battle_data.find(i => i.id === item.id)?.ship_profile ?? defaultBattleData.ship_profile,
       }
-    }).sort((a, b) => {
-      return b.ship_profile.pr - a.ship_profile.pr
     })
     let tempEnemies = enemies.value.map(item => {
       return {
         ...item,
         ship_profile: battleDataResp.value.data.battle_data.find(i => i.id === item.id)?.ship_profile ?? defaultBattleData.ship_profile,
       }
-    }).sort((a, b) => {
+    })
+    teammates.value = tempTeammates.sort((a, b) => {
       return b.ship_profile.pr - a.ship_profile.pr
     })
-    teammates.value = tempTeammates
-    enemies.value = tempEnemies
+    enemies.value = tempEnemies.sort((a, b) => {
+      return b.ship_profile.pr - a.ship_profile.pr
+    })
   } else {
     teammates.value = sortShip(teammates.value)
     enemies.value = sortShip(enemies.value)
@@ -101,8 +101,6 @@ useIntervalFn(async () => {
     }).catch(() => {
       isHiddenStats.value = false
     })
-
-
     let gameData: GameData = JSON.parse(result.raw_data)
     let playersInfo: Vehicle[] = [];
     for (let i = 0; i < gameData.vehicles.length; i++) {
@@ -195,7 +193,7 @@ useIntervalFn(async () => {
       <div class="p-2" />
       <div class="container max-w-full">
         <div class="flex flex-row items-center justify-center">
-          <div class="stats container">
+          <div class="stats container"  :style="{backgroundColor: 'rgba(0, 0, 0, 0)'}" >
             <div class="stat text-center text-sm">
               <div class="flex flex-row stat-value text-xl space-x-2 justify-center items-center">
                 <p>简洁模式</p>
@@ -220,8 +218,8 @@ useIntervalFn(async () => {
         </div>
         <GameStats v-if="!isHiddenStats" :duration="duration" :gameData="gameInfo" :player="player" :battle-data="battleDataResp"/>
         <div class="columns-2 p-4 gap-2">
-          <div>
-            <div v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
+          <ul>
+            <li v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
               <TeammateCard v-if="isDetail"
                   :playerInfo="item"
                   :server="battleHistory.teammate_server"
@@ -230,7 +228,7 @@ useIntervalFn(async () => {
                   :playerInfo="item"
                   :server="battleHistory.teammate_server"
                   :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
-            </div>
+            </li>
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
                 <div class="p-1">
@@ -239,9 +237,9 @@ useIntervalFn(async () => {
                 </div>
               </template>
             </template>
-          </div>
-          <div>
-            <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1">
+          </ul>
+          <ul>
+            <li v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1">
               <EnemyCard v-if="isDetail"
                   :playerInfo="item"
                   :server="battleHistory.enemy_server"
@@ -251,16 +249,16 @@ useIntervalFn(async () => {
                   :playerInfo="item"
                   :server="battleHistory.enemy_server"
                   :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
-            </div>
-            <template v-if="enemies.length < maxItem">
+            </li>
+            <li v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">
                 <div class="p-1">
                   <div v-if="isDetail" class="p-12"></div>
                   <div v-if="!isDetail" class="p-6"></div>
                 </div>
               </template>
-            </template>
-          </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

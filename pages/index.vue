@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 
 import Players from "~/components/player/Players.vue";
+
+
 </script>
 
 <template>

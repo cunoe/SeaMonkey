@@ -21,6 +21,19 @@
       },
       "path": {
         "all": true
+      },
+      "fs": {
+        "readFile": true,
+        "readDir": true,
+        "exists": true,
+        "createDir": true,
+        "scope": ["$APPDATA/*", "$PICTURE/*"]
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": [
+          "$PICTURE/**"
+        ]
       }
     },
     "bundle": {
@@ -58,7 +71,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
     },
     "updater": {
       "active": true,

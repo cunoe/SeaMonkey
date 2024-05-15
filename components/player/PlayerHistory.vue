@@ -197,7 +197,7 @@ onMounted(async () => {
         </div>
         <GameStats :duration="duration" :gameData="gameInfo" :player="player" :battle-data="battleDataResp" />
         <div class="flex justify-center">
-          <div class="stats container">
+          <div class="stats container"  :style="{backgroundColor: 'rgba(0, 0, 0, 0)'}">
             <div class="stat text-center">
               <div class="stat-title">本场游戏开始于</div>
               <div class="stat-value">{{ convertDateToStr(parseDatetime(gameInfo.dateTime)) }}</div>

@@ -96,7 +96,7 @@ function getWRColor(wr: number) {
 <!--        </div>-->
 <!--      </div>-->
 <!--    </div>-->
-    <div class="stats container">
+    <div class="stats container"  :style="{backgroundColor: 'rgba(0, 0, 0, 0)'}">
       <div class="stat text-center">
         <div class="stat-title">你开的船</div>
         <div class="stat-value">

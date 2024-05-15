@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="bg-base-300 flex text-center">
+    <div :class="{'flex text-center backdrop-blur': isSetBackground, 'flex text-center': !isSetBackground}"  :style="{backgroundColor: getBackgroundColor()}">
       <div class="container mx-auto columns-3">
         <!-- 左侧链接部分 -->
         <div>
@@ -27,4 +27,27 @@
   </div>
 </template>
 <script setup lang="ts">
+
+import {getKV} from "~/composables/store/kv";
+import {useIntervalFn} from "@vueuse/core";
+
+const isSetBackground = ref(false);
+
+
+useIntervalFn(()=>{
+  getKV('backgroundImage').then((res) => {
+    isSetBackground.value = res !== 'false'
+  }).catch(() => {
+    isSetBackground.value = false
+  })
+}, 1000)
+
+
+function getBackgroundColor(){
+  if (isSetBackground.value) {
+    return "rgba(0, 0, 0, 0)";
+  }
+  return "#1F202A";
+}
+
 </script>

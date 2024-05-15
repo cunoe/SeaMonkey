@@ -13,6 +13,7 @@ import {getKV} from "~/composables/store/kv";
 const modal = useModal()
 const toast = useToast()
 
+const isSetBackground = ref(false)
 const isMarked = ref(false)
 
 useIntervalFn(() => {
@@ -29,7 +30,18 @@ const props = defineProps<{
   battleData: BattleData
 }>();
 
+
+getKV('backgroundImage').then((res) => {
+  isSetBackground.value = res !== 'false'
+}).catch(() => {
+  isSetBackground.value = false
+})
+
+
 function getPRColorFromUtil(pr: number) {
+  if (isSetBackground.value) {
+    return getPersonalRateData(pr).color + '80';
+  }
   return getPersonalRateData(pr).color;
 }
 function getWRColorFromUtil(wr: number) {
@@ -47,6 +59,17 @@ function getBLTColorFromUtil(blt: number){
 function getFRColorFromUtil(fr: number) {
   return getFRColor(fr)
 }
+function getBackgroundColor(pr: number){
+  // if (!isSetBackground.value) {return 'rgba(0, 0, 0, 0)'} else {return getPRColorFromUtil(pr)}
+  return getPRColorFromUtil(pr)
+}
+function getDefaultBackgroundColor(){
+  if (isSetBackground.value) {return 'rgba(0, 0, 0, 0)'} else {return '#3d348b'}
+}
+function getTextColor(pr: number){
+  // if (isSetBackground.value) {return getPRColorFromUtil(pr)} else {return '#ffffff'}
+  return '#ffffff'
+}
 
 
 function getClan(){
@@ -59,27 +82,28 @@ function getClanColorFromUtil(clanType: number) {
 </script>
 
 <template>
-  <div>
+  <div class="">
 <!--    <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-12">-->
-    <div class="relative bg-[#3d348b] rounded-lg shadow-lg w-[40rem] p-6">
+    <div class="relative bg-[#3d348b] rounded-lg w-[40rem] p-6"  :style="{backgroundColor: getDefaultBackgroundColor()}">
       <a @click="modal.open(PlayerInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
         <div class="absolute left-4 top-2.5 leading-loose hover-scale">
-          <div class="text-white font-bold text-xl join"><p :style="{color: getClanColorFromUtil(battleData.clan_type)}">{{getClan()}}</p><p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p>
+          <div class="text-white font-bold text-xl join">
+            <p :style="{color: getClanColorFromUtil(battleData.clan_type)}">{{getClan()}}</p>
+            <p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p>
             <p :class="{'text-orange-600': isMarked, '': !isMarked}">{{ playerInfo.name }}</p>
             <p :class="{'text-orange-600': isMarked, '': !isMarked}" v-if="isMarked">*</p></div>
         </div>
-
       </a>
       <a @click="modal.open(PlayerShipInfoModal, {player: playerInfo, playerServer: server, battleData: battleData})" class="text-white/50 cursor-pointer font-bold">
 <!--        <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-12 w-[22rem] hover-scale">-->
-        <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg shadow-lg p-6 w-[22rem] hover-scale" :style="{backgroundColor: getPRColorFromUtil(battleData.ship_profile.pr)}">
+        <div class="absolute inset-y-0 right-0 bg-[#7678ed] rounded-lg p-6 w-[22rem] hover-scale" :style="{backgroundColor: getBackgroundColor(battleData.ship_profile.pr)}">
           <div class="absolute right-4 top-2.5 text-end">
-            <h2 class="text-white font-bold text-xl">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>
+            <h2 class="text-white font-bold text-xl" :style="{color: getTextColor(battleData.ship_profile.pr)}">{{playerInfo.shipInfo ? playerInfo.shipInfo.ship_name.zh_sg+' '+numberToRoman(playerInfo.shipInfo.tier) : '不认识这艘船捏'}}</h2>
           </div>
           <div class="absolute left-4 top-1 w-[12rem]">
             <div class="grid grid-cols-1 text-sm text-white text-start">
-              <div class=" ">胜率 {{battleData.ship_profile.wr}}%</div>
-              <div class=" ">伤害 {{battleData.ship_profile.dmg}}</div>
+              <div class="">胜率 {{battleData.ship_profile.wr}}%</div>
+              <div class="">伤害 {{battleData.ship_profile.dmg}}</div>
             </div>
           </div>
         </div>

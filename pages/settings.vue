@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import {getKV, saveKV} from "~/composables/store/kv";
 import { open } from '@tauri-apps/api/dialog';
-import { desktopDir } from '@tauri-apps/api/path';
+import {desktopDir, pictureDir} from '@tauri-apps/api/path';
+import {useIntervalFn} from "@vueuse/core";
+import {BaseDirectory, createDir, exists, readDir} from "@tauri-apps/api/fs";
+import {convertFileSrc} from "@tauri-apps/api/tauri";
 
 async function selectDir() {
   const selected = await open({
@@ -131,14 +134,72 @@ onBeforeMount(async () => {
     currentClanEnemyServerIndex.value = 0
   }
   clanEnemyServerSelected.value = clanEnemyServer[currentClanEnemyServerIndex.value]
+
+  backgroundDir.value = await pictureDir() + "\SeaMonkeyBackground"
 })
 
+const imagesListToSelect = ref<any[]>([
+  {
+    id: 'false',
+    label: '无'
+  }
+]);
+const imageSelected = ref(imagesListToSelect.value[0]);
+const backgroundDir = ref<string>('')
+const lastSelected = ref<string>('')
 
+watch(imageSelected, () => {
+  if (lastSelected.value === imageSelected.value.id) {
+    return
+  }
+  saveKV('backgroundImage', imageSelected.value.id)
+  toast.add({
+    title: '背景图片修改成功',
+  })
+  lastSelected.value = imageSelected.value.id
+})
+
+useIntervalFn(async () => {
+  const bgn = await getKV('backgroundImage')
+  exists('SeaMonkeyBackground', {
+    dir: BaseDirectory.Picture,
+  }).then(async (result) => {
+    if (!result) {
+      console.log('No background images found in cache')
+      await createDir('SeaMonkeyBackground', {
+        dir: BaseDirectory.Picture,
+        recursive: true
+      })
+    } else {
+      const images_in_cache = await readDir(
+          'SeaMonkeyBackground',
+          {
+            dir: BaseDirectory.Picture,
+            recursive: false
+          }
+      );
+      imagesListToSelect.value.splice(1)
+      for (const entry of images_in_cache) {
+        if (bgn === convertFileSrc(entry.path)) {
+          imageSelected.value = {
+            id: convertFileSrc(entry.path),
+            label: entry.name ? entry.name : entry.path
+          }
+          continue
+        }
+        imagesListToSelect.value.push({
+          id: convertFileSrc(entry.path),
+          label: entry.name ? entry.name : entry.path
+        });
+      }
+    }
+  })
+}, 1000)
 </script>
 
 <template>
   <div>
-    <div class="container mx-auto max-w-screen-md">
+    <div class="container mx-auto max-w-screen-md rounded-lg backdrop-blur-sm">
       <div class="grid grid-cols-1 gap-4">
         <div>
           <div class="w-full">
@@ -177,6 +238,15 @@ onBeforeMount(async () => {
             保存
           </button>
           <hr class="my-4 border-t border-gray-600 opacity-50">
+          <div class="space-y-4">
+            <div>
+              <div class="text-xl text-gray-200">背景图片</div>
+              <div class="text-sm text-gray-400">*请将图片放置到 {{backgroundDir}}</div>
+              <ul>
+                <USelectMenu  v-model="imageSelected" :options="imagesListToSelect"></USelectMenu>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
