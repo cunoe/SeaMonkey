@@ -36,7 +36,7 @@ const isSetBackground = ref(false);
 
 useIntervalFn(()=>{
   getKV('backgroundImage').then((res) => {
-    isSetBackground.value = res !== 'false'
+    isSetBackground.value = !(res === 'false' || res === '');
   }).catch(() => {
     isSetBackground.value = false
   })
