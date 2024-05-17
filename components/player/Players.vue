@@ -112,17 +112,12 @@ useIntervalFn(async () => {
         })
       }
     }
-    console.log(gameData)
-    console.log(playersInfo)
     player.value = <Vehicle>playersInfo.find(item => item.relation === 0)
-    teammates.value = sortShip(playersInfo.filter(item => item.relation !== 2))
-    enemies.value = sortShip(playersInfo.filter(item => item.relation === 2))
+    teammates.value = playersInfo.filter(item => item.relation !== 2)
+    enemies.value = playersInfo.filter(item => item.relation === 2)
     maxItem.value = Math.max(teammates.value.length, enemies.value.length)
     gameInfo.value = gameData
     battleHistory.value = result
-
-    console.log(enemies.value)
-    console.log(teammates.value)
 
     let battleType = 'pvp'
     if (gameData.matchGroup.toUpperCase() === 'RANKED') {
@@ -160,6 +155,7 @@ useIntervalFn(async () => {
       })
       screenInfo.value = '获取数据失败' + err.message
       console.log(err)
+      timestamp.value = 0
     })
 
     timestamp.value = result.timestamp
