@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import AppNavbar from '~/components/main/AppNavbar.vue';
-import {useInterval, useIntervalFn} from "@vueuse/core";
+import {useIntervalFn} from "@vueuse/core";
 import {getKV} from "~/composables/store/kv";
 
 const currentImage = ref<string>('');

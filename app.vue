@@ -12,7 +12,6 @@ import type {GameData, Vehicle} from "~/types/GameData";
 import { SettingsNeededSettingsModal } from '#components';
 import {saveBattleHistory} from "~/composables/store/battle_history";
 import checkServerValidity from "~/utils/check.server";
-import {checkServer} from "#imports";
 
 const modal = useModal()
 const toast = useToast()

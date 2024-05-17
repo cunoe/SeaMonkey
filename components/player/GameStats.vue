@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import convertMatchGroup from "~/utils/convert.matchgroup";
 import convertSecondsToString from "~/utils/convert.seconds.to.string";
 import numberToRoman from "~/utils/number.to.roman";
 import type {GameData, Vehicle} from "~/types/GameData";
-import {type BattleDataResponse, defaultBattleData} from "~/composables/requests/kokomi";
+import {type BattleDataResponse} from "~/composables/requests/kokomi";
 import getWinRateColor from "~/utils/get.wr.color";
 
 const props = defineProps<{

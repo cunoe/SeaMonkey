@@ -1,7 +1,7 @@
 import type {Vehicle} from "~/types/GameData";
 
 export default function sortVehicles(arr: Vehicle[]): Vehicle[] {
-    let UndefinedShip: Vehicle[] = arr.filter(vehicle => !vehicle.shipInfo);
+    let UndefinedShip: Vehicle[] = arr.filter(vehicle => vehicle.shipInfo && vehicle.shipInfo.type === "");
     let AirCarrier = arr.filter(vehicle => vehicle.shipInfo && vehicle.shipInfo.type === "AirCarrier").sort((a, b) => {return b.shipInfo.tier - a.shipInfo.tier;});
     let Battleship = arr.filter(vehicle => vehicle.shipInfo && vehicle.shipInfo.type === "Battleship").sort((a, b) => {return b.shipInfo.tier - a.shipInfo.tier;});
     let Cruiser = arr.filter(vehicle => vehicle.shipInfo && vehicle.shipInfo.type === "Cruiser").sort((a, b) => {return b.shipInfo.tier - a.shipInfo.tier;});

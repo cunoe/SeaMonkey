@@ -112,12 +112,17 @@ useIntervalFn(async () => {
         })
       }
     }
+    console.log(gameData)
+    console.log(playersInfo)
     player.value = <Vehicle>playersInfo.find(item => item.relation === 0)
     teammates.value = sortShip(playersInfo.filter(item => item.relation !== 2))
     enemies.value = sortShip(playersInfo.filter(item => item.relation === 2))
     maxItem.value = Math.max(teammates.value.length, enemies.value.length)
     gameInfo.value = gameData
     battleHistory.value = result
+
+    console.log(enemies.value)
+    console.log(teammates.value)
 
     let battleType = 'pvp'
     if (gameData.matchGroup.toUpperCase() === 'RANKED') {
@@ -160,6 +165,9 @@ useIntervalFn(async () => {
     timestamp.value = result.timestamp
     teammateServer.value = result.teammate_server
     enemyServer.value = result.enemy_server
+
+    console.log(enemies.value)
+    console.log(teammates.value)
   }
 }, 5000)
 useIntervalFn(async () => {

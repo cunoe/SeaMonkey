@@ -21,3 +21,10 @@ export async function saveKV(key: string, value: string): Promise<number> {
     return res.rowsAffected;
   });
 }
+
+export async function deleteKV(key: string): Promise<number> {
+    const db = await Database.load("sqlite:data.db");
+    return db.execute("DELETE FROM properties WHERE key = ?", [key]).then((res) => {
+        return res.rowsAffected;
+    });
+}

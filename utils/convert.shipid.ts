@@ -1,19 +1,29 @@
 import {fetchShipInfo} from "~/composables/requests/yuyuko";
-import {getKV, saveKV} from "~/composables/store/kv";
+import {getKV, saveKV, deleteKV} from "~/composables/store/kv";
 
-export default async function convertShipid(id: string): Promise<ShipInfo | null> {
+export default async function convertShipid(id: string): Promise<ShipInfo> {
     const shipInfo = shipMap[id];
     if (shipInfo) {
         return shipInfo;
     } else {
         const cacheShipInfo = await getKV(`ship_info_${id}`)
         if (cacheShipInfo) {
-            return JSON.parse(cacheShipInfo)
+            let info = JSON.parse(cacheShipInfo) as ShipInfo
+            if (info.ship_name.zh_sg === "未知战舰") {
+                await deleteKV(`ship_info_${id}`)
+                return defaultShipInfo
+            } else {
+                return info
+            }
         }
         const shipInfoResp = await fetchShipInfo(id)
         if (shipInfoResp === null) {
-            return null
+            return defaultShipInfo
         }else {
+            if (shipInfoResp.data.nameCn === "未知战舰") {
+                return defaultShipInfo
+            }
+
             let cacheShipInfo = {
                 tier: shipInfoResp.data.level,
                 type: shipInfoResp.data.shipType,
@@ -29,6 +39,19 @@ export default async function convertShipid(id: string): Promise<ShipInfo | null
             await saveKV(`ship_info_${id}`, JSON.stringify(cacheShipInfo))
             return cacheShipInfo
         }
+    }
+}
+
+export const defaultShipInfo: ShipInfo = {
+    tier: 0,
+    type: "",
+    nation: "",
+    name: "",
+    ship_name: {
+        zh_sg: "未知战舰",
+        en: "Unknown Ship",
+        nick: [],
+        other: [],
     }
 }
 
