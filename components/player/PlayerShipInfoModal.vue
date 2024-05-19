@@ -3,7 +3,7 @@
 import type {Vehicle} from "~/types/GameData";
 import convertServerToLocale from "../../utils/convert.server";
 import numberToRoman from "~/utils/number.to.roman";
-import {type BattleData, fetchShipData, type ShipDataResponse} from "~/composables/requests/kokomi";
+import {type BattleDataItem, fetchShipData, type ShipDataResponse} from "~/composables/requests/kokomi";
 import getPersonalRateData from "../../utils/get.pr.data";
 import getWinRateColor from "~/utils/get.wr.color";
 import getDMGColor from "~/utils/get.dmg.color";
@@ -13,7 +13,7 @@ import getFRColor from "~/utils/get.fr.color";
 const props = defineProps<{
   player: Vehicle,
   playerServer: string
-  battleData: BattleData
+  battleData: BattleDataItem
 }>();
 
 const toast = useToast()
@@ -41,9 +41,9 @@ onBeforeMount(() => {
     isReady.value = true
   }).catch((err) => {
     toast.add({
-      title: "获取数据失败：" + err.message,
+      title: "获取数据失败：" + err,
     })
-    info.value = "获取数据失败：" + err.message
+    info.value = "获取数据失败：" + err
     console.log(err)
   })
 })
@@ -149,27 +149,27 @@ function getFRColorFromUtil(fr: number) {
                 </div>
               </div>
               <div v-if="isReady">
-                <div class="flex flex-row text-white text-xl rounded-lg font-bold text-center justify-center items-center"  :style="{backgroundColor: getPRColorFromUtil(shipData.data.pr.pr)}">
-                  {{getPersonalRateData(shipData.data.pr.pr).name}} {{shipData.data.pr.pr}}
+                <div class="flex flex-row text-white text-xl rounded-lg font-bold text-center justify-center items-center"  :style="{backgroundColor: getPRColorFromUtil(shipData.pr.pr)}">
+                  {{getPersonalRateData(shipData.pr.pr).name}} {{shipData.pr.pr}}
                 </div>
                 <div class="p-1"></div>
                 <div class="flex justify-center">
                   <div class="stats container">
                     <div class="stat text-center">
                       <div class="stat-title"><Icon name="arcticons:battleforwesnoth" class="text-xl"/>战斗场数</div>
-                      <div class="stat-value">{{ shipData.data.pr.blt }}</div>
+                      <div class="stat-value">{{ shipData.pr.blt }}</div>
                     </div>
                     <div class="stat text-center">
                       <div class="stat-title"><Icon name="game-icons:target-prize"/>平均胜率</div>
-                      <div class="stat-value" :style="{color: getWRColorFromUtil(shipData.data.pr.wr)}">{{ shipData.data.pr.wr }}%</div>
+                      <div class="stat-value" :style="{color: getWRColorFromUtil(shipData.pr.wr)}">{{ shipData.pr.wr }}%</div>
                     </div>
                     <div class="stat text-center">
                       <div class="stat-title"><Icon name="material-symbols:water-drop" />场均伤害</div>
-                      <div class="stat-value" :style="{color: getDMGColorFromUtil(shipData.data.pr.dmg, '')}">{{ shipData.data.pr.dmg }}</div>
+                      <div class="stat-value" :style="{color: getDMGColorFromUtil(shipData.pr.dmg, '')}">{{ shipData.pr.dmg }}</div>
                     </div>
                     <div class="stat text-center">
                       <div class="stat-title"><Icon name="material-symbols:kid-star-sharp" />场均经验</div>
-                      <div class="stat-value" :style="{color: getExpColorFromUtil(shipData.data.pr.exp)}">{{ shipData.data.pr.exp }}</div>
+                      <div class="stat-value" :style="{color: getExpColorFromUtil(shipData.pr.exp)}">{{ shipData.pr.exp }}</div>
                     </div>
                   </div>
                 </div>
@@ -201,86 +201,86 @@ function getFRColorFromUtil(fr: number) {
                   </div>
                   <div>
                     <div class="text-center text-gray-400">
-                      <p class="">{{ shipData.data.bt.pvp_solo.blt }}</p>
+                      <p class="">{{ shipData.bt.pvp_solo.blt }}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="">{{ shipData.data.bt.pvp_div2.blt }}</p>
+                      <p class="">{{ shipData.bt.pvp_div2.blt }}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="">{{ shipData.data.bt.pvp_div3.blt }}</p>
+                      <p class="">{{ shipData.bt.pvp_div3.blt }}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="">{{ shipData.data.bt.rank_solo.blt }}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getPRColorFromUtil(shipData.data.bt.pvp_solo.pr)}">{{getPersonalRateData(shipData.data.bt.pvp_solo.pr).name}} {{shipData.data.bt.pvp_solo.pr}}</p>
-                    </div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getPRColorFromUtil(shipData.data.bt.pvp_div2.pr)}">{{getPersonalRateData(shipData.data.bt.pvp_div2.pr).name}} {{shipData.data.bt.pvp_div2.pr}}</p>
-                    </div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getPRColorFromUtil(shipData.data.bt.pvp_div3.pr)}">{{getPersonalRateData(shipData.data.bt.pvp_div3.pr).name}} {{shipData.data.bt.pvp_div3.pr}}</p>
-                    </div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getPRColorFromUtil(shipData.data.bt.rank_solo.pr)}">{{getPersonalRateData(shipData.data.bt.rank_solo.pr).name}} {{shipData.data.bt.rank_solo.pr}}</p>
+                      <p class="">{{ shipData.bt.rank_solo.blt }}</p>
                     </div>
                   </div>
                   <div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getWRColorFromUtil(shipData.data.bt.pvp_solo.wr)}">{{shipData.data.bt.pvp_solo.wr}}%</p>
+                      <p class="" :style="{color: getPRColorFromUtil(shipData.bt.pvp_solo.pr)}">{{getPersonalRateData(shipData.bt.pvp_solo.pr).name}} {{shipData.bt.pvp_solo.pr}}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getWRColorFromUtil(shipData.data.bt.pvp_div2.wr)}">{{shipData.data.bt.pvp_div2.wr}}%</p>
+                      <p class="" :style="{color: getPRColorFromUtil(shipData.bt.pvp_div2.pr)}">{{getPersonalRateData(shipData.bt.pvp_div2.pr).name}} {{shipData.bt.pvp_div2.pr}}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getWRColorFromUtil(shipData.data.bt.pvp_div3.wr)}">{{shipData.data.bt.pvp_div3.wr}}%</p>
+                      <p class="" :style="{color: getPRColorFromUtil(shipData.bt.pvp_div3.pr)}">{{getPersonalRateData(shipData.bt.pvp_div3.pr).name}} {{shipData.bt.pvp_div3.pr}}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getWRColorFromUtil(shipData.data.bt.rank_solo.wr)}">{{shipData.data.bt.rank_solo.wr}}%</p>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getDMGColorFromUtil(shipData.data.bt.pvp_solo.dmg, '')}">{{shipData.data.bt.pvp_solo.dmg}}</p>
-                    </div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getDMGColorFromUtil(shipData.data.bt.pvp_div2.dmg, '')}">{{shipData.data.bt.pvp_div2.dmg}}</p>
-                    </div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getDMGColorFromUtil(shipData.data.bt.pvp_div3.dmg, '')}">{{shipData.data.bt.pvp_div3.dmg}}</p>
-                    </div>
-                    <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getDMGColorFromUtil(shipData.data.bt.rank_solo.dmg, '')}">{{shipData.data.bt.rank_solo.dmg}}</p>
+                      <p class="" :style="{color: getPRColorFromUtil(shipData.bt.rank_solo.pr)}">{{getPersonalRateData(shipData.bt.rank_solo.pr).name}} {{shipData.bt.rank_solo.pr}}</p>
                     </div>
                   </div>
                   <div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getFRColorFromUtil(shipData.data.bt.pvp_solo.fr)}">{{shipData.data.bt.pvp_solo.fr}}</p>
+                      <p class="" :style="{color: getWRColorFromUtil(shipData.bt.pvp_solo.wr)}">{{shipData.bt.pvp_solo.wr}}%</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getFRColorFromUtil(shipData.data.bt.pvp_div2.fr)}">{{shipData.data.bt.pvp_div2.fr}}</p>
+                      <p class="" :style="{color: getWRColorFromUtil(shipData.bt.pvp_div2.wr)}">{{shipData.bt.pvp_div2.wr}}%</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getFRColorFromUtil(shipData.data.bt.pvp_div3.fr)}">{{shipData.data.bt.pvp_div3.fr}}</p>
+                      <p class="" :style="{color: getWRColorFromUtil(shipData.bt.pvp_div3.wr)}">{{shipData.bt.pvp_div3.wr}}%</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getFRColorFromUtil(shipData.data.bt.rank_solo.fr)}">{{shipData.data.bt.rank_solo.fr}}</p>
+                      <p class="" :style="{color: getWRColorFromUtil(shipData.bt.rank_solo.wr)}">{{shipData.bt.rank_solo.wr}}%</p>
                     </div>
                   </div>
                   <div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getExpColorFromUtil(shipData.data.bt.pvp_solo.exp)}">{{shipData.data.bt.pvp_solo.exp}}</p>
+                      <p class="" :style="{color: getDMGColorFromUtil(shipData.bt.pvp_solo.dmg, '')}">{{shipData.bt.pvp_solo.dmg}}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getExpColorFromUtil(shipData.data.bt.pvp_div2.exp)}">{{shipData.data.bt.pvp_div2.exp}}</p>
+                      <p class="" :style="{color: getDMGColorFromUtil(shipData.bt.pvp_div2.dmg, '')}">{{shipData.bt.pvp_div2.dmg}}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getExpColorFromUtil(shipData.data.bt.pvp_div3.exp)}">{{shipData.data.bt.pvp_div3.exp}}</p>
+                      <p class="" :style="{color: getDMGColorFromUtil(shipData.bt.pvp_div3.dmg, '')}">{{shipData.bt.pvp_div3.dmg}}</p>
                     </div>
                     <div class="text-center text-gray-400">
-                      <p class="" :style="{color: getExpColorFromUtil(shipData.data.bt.rank_solo.exp)}">{{shipData.data.bt.rank_solo.exp}}</p>
+                      <p class="" :style="{color: getDMGColorFromUtil(shipData.bt.rank_solo.dmg, '')}">{{shipData.bt.rank_solo.dmg}}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getFRColorFromUtil(shipData.bt.pvp_solo.fr)}">{{shipData.bt.pvp_solo.fr}}</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getFRColorFromUtil(shipData.bt.pvp_div2.fr)}">{{shipData.bt.pvp_div2.fr}}</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getFRColorFromUtil(shipData.bt.pvp_div3.fr)}">{{shipData.bt.pvp_div3.fr}}</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getFRColorFromUtil(shipData.bt.rank_solo.fr)}">{{shipData.bt.rank_solo.fr}}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getExpColorFromUtil(shipData.bt.pvp_solo.exp)}">{{shipData.bt.pvp_solo.exp}}</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getExpColorFromUtil(shipData.bt.pvp_div2.exp)}">{{shipData.bt.pvp_div2.exp}}</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getExpColorFromUtil(shipData.bt.pvp_div3.exp)}">{{shipData.bt.pvp_div3.exp}}</p>
+                    </div>
+                    <div class="text-center text-gray-400">
+                      <p class="" :style="{color: getExpColorFromUtil(shipData.bt.rank_solo.exp)}">{{shipData.bt.rank_solo.exp}}</p>
                     </div>
                   </div>
                 </div>
@@ -295,79 +295,79 @@ function getFRColorFromUtil(fr: number) {
                   <div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">存活率</p>
-                      <p class="text-end">{{shipData.data.info.survival_rate}}%</p>
+                      <p class="text-end">{{shipData.info.survival_rate}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">飞机击落</p>
-                      <p class="text-end">{{shipData.data.info.avg_planes_killed}}</p>
+                      <p class="text-end">{{shipData.info.avg_planes_killed}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">潜在伤害</p>
-                      <p class="text-end">{{shipData.data.info.avg_potential_dmage}}</p>
+                      <p class="text-end">{{shipData.info.avg_potential_dmage}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">侦查伤害</p>
-                      <p class="text-end">{{shipData.data.info.avg_spotting_damage}}</p>
+                      <p class="text-end">{{shipData.info.avg_spotting_damage}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">占领贡献</p>
-                      <p class="text-end">{{shipData.data.info.captuer_contribution}}%</p>
+                      <p class="text-end">{{shipData.info.captuer_contribution}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">防御贡献</p>
-                      <p class="text-end">{{shipData.data.info.defense_contribution}}%</p>
+                      <p class="text-end">{{shipData.info.defense_contribution}}%</p>
                     </div>
                   </div>
                   <div class="">
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">主炮</p>
-                      <p class="text-end">{{shipData.data.info.main_battery}}%</p>
+                      <p class="text-end">{{shipData.info.main_battery}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">副炮</p>
-                      <p class="text-end">{{shipData.data.info.second_battrey}}%</p>
+                      <p class="text-end">{{shipData.info.second_battrey}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">鱼雷</p>
-                      <p class="text-end">{{shipData.data.info.torpedo}}%</p>
+                      <p class="text-end">{{shipData.info.torpedo}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">火箭</p>
-                      <p class="text-end">{{shipData.data.info.rocket}}%</p>
+                      <p class="text-end">{{shipData.info.rocket}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">炸弹</p>
-                      <p class="text-end">{{shipData.data.info.bomb}}%</p>
+                      <p class="text-end">{{shipData.info.bomb}}%</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">跳弹</p>
-                      <p class="text-end">{{shipData.data.info.skip_bomb}}%</p>
+                      <p class="text-end">{{shipData.info.skip_bomb}}%</p>
                     </div>
                   </div>
                   <div class="">
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">击杀</p>
-                      <p class="text-end">{{shipData.data.info.max_frags}}</p>
+                      <p class="text-end">{{shipData.info.max_frags}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">伤害</p>
-                      <p class="text-end">{{shipData.data.info.max_damage}}</p>
+                      <p class="text-end">{{shipData.info.max_damage}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">潜在伤害</p>
-                      <p class="text-end">{{shipData.data.info.max_potential_damage}}</p>
+                      <p class="text-end">{{shipData.info.max_potential_damage}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">裸经验</p>
-                      <p class="text-end">{{shipData.data.info.max_exp}}</p>
+                      <p class="text-end">{{shipData.info.max_exp}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">侦查伤害</p>
-                      <p class="text-end">{{shipData.data.info.max_spotting_damage}}</p>
+                      <p class="text-end">{{shipData.info.max_spotting_damage}}</p>
                     </div>
                     <div class="flex flex-row justify-between items-center gap-4 px-4 text-gray-400">
                       <p class="text-start">飞机击落</p>
-                      <p class="text-end">{{shipData.data.info.max_planes_killed}}</p>
+                      <p class="text-end">{{shipData.info.max_planes_killed}}</p>
                     </div>
                   </div>
                 </div>

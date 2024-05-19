@@ -98,6 +98,18 @@ function changeDir() {
   saveKV('gameDir', dirInput.value)
 }
 
+watch(dirInput, () => {
+  changeDir()
+})
+
+watch(serverSelected, () => {
+  changeServer()
+})
+
+watch(clanEnemyServerSelected, () => {
+  changeClanEnemyServer()
+})
+
 function changeServer() {
   if (serverSelected.value.id) {
     saveKV('gameServer', serverSelected.value.id)
@@ -210,11 +222,7 @@ useIntervalFn(async () => {
               选择目录
             </button>
             <div class="text-sm text-gray-400" v-if="currentDir!==''">当前目录：{{ currentDir }}</div>
-            <div class="text-sm text-gray-400" v-if="dirInput !==''">已选择目录：{{ dirInput }}</div>
           </div>
-          <button class='btn' @click="changeDir">
-            保存
-          </button>
           <!-- 分割线 -->
           <hr class="my-4 border-t border-gray-600 opacity-50">
           <div class="space-y-4">
@@ -224,9 +232,6 @@ useIntervalFn(async () => {
             </div>
             <USelectMenu  v-model="serverSelected" :options="server"></USelectMenu>
           </div>
-          <button class='btn' @click="changeServer">
-            保存
-          </button>
           <hr class="my-4 border-t border-gray-600 opacity-50">
           <div class="space-y-4">
             <div class="w-full">
@@ -234,9 +239,6 @@ useIntervalFn(async () => {
             </div>
             <USelectMenu  v-model="clanEnemyServerSelected" :options="clanEnemyServer"></USelectMenu>
           </div>
-          <button class='btn' @click="changeClanEnemyServer">
-            保存
-          </button>
           <hr class="my-4 border-t border-gray-600 opacity-50">
           <div class="space-y-4">
             <div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {GameData, Vehicle} from '~/types/GameData';
 import {PlayerInfoModal, PlayerShipInfoModal} from "#components";
-import type {BattleData, ShipProfile, UserProfile} from "~/composables/requests/kokomi";
+import type {BattleDataItem} from "~/composables/requests/kokomi";
 import getPersonalRateData from "~/utils/get.pr.data";
 import getWinRateColor from "~/utils/get.wr.color";
 import getDMGColor from "~/utils/get.dmg.color";
@@ -24,7 +24,7 @@ useIntervalFn(() => {
 const props = defineProps<{
   playerInfo: Vehicle
   server: string
-  battleData: BattleData
+  battleData: BattleDataItem
 }>();
 
 function getPRColorFromUtil(pr: number) {

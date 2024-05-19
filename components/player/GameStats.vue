@@ -24,8 +24,8 @@ const teammateAvgWR = computed(() => {
   let total = 0
   let n = 0
   teammates.value.forEach(item => {
-    if (props.battleData.data.battle_data.find(i => i.id === item.id)) {
-      total += props.battleData.data.battle_data.find(i => i.id === item.id)!.user_profile.wr
+    if (props.battleData.battle_data.find(i => i.id === item.id)) {
+      total += props.battleData.battle_data.find(i => i.id === item.id)!.user_profile.wr
       n++
     }
   })
@@ -36,8 +36,8 @@ const enemyAvgWR = computed(() => {
   let total = 0
   let n = 0
   enemies.value.forEach(item => {
-    if (props.battleData.data.battle_data.find(i => i.id === item.id)) {
-      total += props.battleData.data.battle_data.find(i => i.id === item.id)!.user_profile.wr
+    if (props.battleData.battle_data.find(i => i.id === item.id)) {
+      total += props.battleData.battle_data.find(i => i.id === item.id)!.user_profile.wr
       n++
     }
   })
@@ -48,8 +48,8 @@ const teammateAvgShipWR = computed(() => {
   let total = 0
   let n = 0
   teammates.value.forEach(item => {
-    if (props.battleData.data.battle_data.find(i => i.id === item.id)) {
-      total += props.battleData.data.battle_data.find(i => i.id === item.id)!.ship_profile.wr
+    if (props.battleData.battle_data.find(i => i.id === item.id)) {
+      total += props.battleData.battle_data.find(i => i.id === item.id)!.ship_profile.wr
       n++
     }
   })
@@ -60,8 +60,8 @@ const enemyAvgShipWR = computed(() => {
   let total = 0
   let n = 0
   enemies.value.forEach(item => {
-    if (props.battleData.data.battle_data.find(i => i.id === item.id)) {
-      total += props.battleData.data.battle_data.find(i => i.id === item.id)!.ship_profile.wr
+    if (props.battleData.battle_data.find(i => i.id === item.id)) {
+      total += props.battleData.battle_data.find(i => i.id === item.id)!.ship_profile.wr
       n++
     }
   })

@@ -2,7 +2,7 @@
 
 import type {Vehicle} from "~/types/GameData";
 import convertServerToLocale from "../../utils/convert.server";
-import {type BattleData, fetchPlayerData, type PlayerDataResponse} from "~/composables/requests/kokomi";
+import {type BattleDataItem, fetchPlayerData, type PlayerDataResponse} from "~/composables/requests/kokomi";
 import getPersonalRateData from "../../utils/get.pr.data";
 import getWinRateColor from "~/utils/get.wr.color";
 import getDMGColor from "~/utils/get.dmg.color";
@@ -13,7 +13,7 @@ import {getKV, saveKV} from "~/composables/store/kv";
 const props = defineProps<{
   player: Vehicle,
   playerServer: string
-  battleData: BattleData
+  battleData: BattleDataItem
 }>();
 
 const toast = useToast()
@@ -119,27 +119,27 @@ function getFRColorFromUtil(fr: number) {
               </div>
             </div>
             <div v-if="isReady">
-              <div class="flex flex-row text-white text-xl rounded-lg font-bold text-center justify-center items-center"  :style="{backgroundColor: getPRColorFromUtil(playerData.data.bt.pvp_solo.pr)}">
-                {{getPersonalRateData(playerData.data.pr.pr).name}} {{playerData.data.pr.pr}}
+              <div class="flex flex-row text-white text-xl rounded-lg font-bold text-center justify-center items-center"  :style="{backgroundColor: getPRColorFromUtil(playerData.bt.pvp_solo.pr)}">
+                {{getPersonalRateData(playerData.pr.pr).name}} {{playerData.pr.pr}}
               </div>
               <div class="p-1"></div>
               <div class="flex justify-center">
                 <div class="stats container">
                   <div class="stat text-center">
                     <div class="stat-title"><Icon name="arcticons:battleforwesnoth" class="text-xl"/>战斗场数</div>
-                    <div class="stat-value">{{playerData.data.pr.blt}}</div>
+                    <div class="stat-value">{{playerData.pr.blt}}</div>
                   </div>
                   <div class="stat text-center">
                     <div class="stat-title"><Icon name="game-icons:target-prize"/>平均胜率</div>
-                    <div class="stat-value" :style="{color: getWRColorFromUtil(playerData.data.pr.wr)}">{{playerData.data.pr.wr}}%</div>
+                    <div class="stat-value" :style="{color: getWRColorFromUtil(playerData.pr.wr)}">{{playerData.pr.wr}}%</div>
                   </div>
                   <div class="stat text-center">
                     <div class="stat-title"><Icon name="material-symbols:water-drop" />场均伤害</div>
-                    <div class="stat-value" :style="{color: getDMGColorFromUtil(playerData.data.pr.dmg, '')}">{{playerData.data.pr.dmg}}</div>
+                    <div class="stat-value" :style="{color: getDMGColorFromUtil(playerData.pr.dmg, '')}">{{playerData.pr.dmg}}</div>
                   </div>
                   <div class="stat text-center">
                     <div class="stat-title"><Icon name="material-symbols:kid-star-sharp" />场均经验</div>
-                    <div class="stat-value" :style="{color: getExpColorFromUtil(playerData.data.pr.exp)}">{{playerData.data.pr.exp}}</div>
+                    <div class="stat-value" :style="{color: getExpColorFromUtil(playerData.pr.exp)}">{{playerData.pr.exp}}</div>
                   </div>
                 </div>
               </div>
@@ -171,86 +171,86 @@ function getFRColorFromUtil(fr: number) {
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{ playerData.data.bt.pvp_solo.blt }}</p>
+                    <p class="">{{ playerData.bt.pvp_solo.blt }}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{ playerData.data.bt.pvp_div2.blt }}</p>
+                    <p class="">{{ playerData.bt.pvp_div2.blt }}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{ playerData.data.bt.pvp_div3.blt }}</p>
+                    <p class="">{{ playerData.bt.pvp_div3.blt }}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{ playerData.data.bt.rank_solo.blt }}</p>
-                  </div>
-                </div>
-                <div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getPRColorFromUtil(playerData.data.bt.pvp_solo.pr)}">{{getPersonalRateData(playerData.data.bt.pvp_solo.pr).name}} {{playerData.data.bt.pvp_solo.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getPRColorFromUtil(playerData.data.bt.pvp_div2.pr)}">{{getPersonalRateData(playerData.data.bt.pvp_div2.pr).name}} {{playerData.data.bt.pvp_div2.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getPRColorFromUtil(playerData.data.bt.pvp_div3.pr)}">{{getPersonalRateData(playerData.data.bt.pvp_div3.pr).name}} {{playerData.data.bt.pvp_div3.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getPRColorFromUtil(playerData.data.bt.rank_solo.pr)}">{{getPersonalRateData(playerData.data.bt.rank_solo.pr).name}} {{playerData.data.bt.rank_solo.pr}}</p>
+                    <p class="">{{ playerData.bt.rank_solo.blt }}</p>
                   </div>
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.bt.pvp_solo.wr)}">{{playerData.data.bt.pvp_solo.wr}}%</p>
+                    <p class="" :style="{color: getPRColorFromUtil(playerData.bt.pvp_solo.pr)}">{{getPersonalRateData(playerData.bt.pvp_solo.pr).name}} {{playerData.bt.pvp_solo.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.bt.pvp_div2.wr)}">{{playerData.data.bt.pvp_div2.wr}}%</p>
+                    <p class="" :style="{color: getPRColorFromUtil(playerData.bt.pvp_div2.pr)}">{{getPersonalRateData(playerData.bt.pvp_div2.pr).name}} {{playerData.bt.pvp_div2.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.bt.pvp_div3.wr)}">{{playerData.data.bt.pvp_div3.wr}}%</p>
+                    <p class="" :style="{color: getPRColorFromUtil(playerData.bt.pvp_div3.pr)}">{{getPersonalRateData(playerData.bt.pvp_div3.pr).name}} {{playerData.bt.pvp_div3.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.bt.rank_solo.wr)}">{{playerData.data.bt.rank_solo.wr}}%</p>
-                  </div>
-                </div>
-                <div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.bt.pvp_solo.dmg, '')}">{{playerData.data.bt.pvp_solo.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.bt.pvp_div2.dmg, '')}">{{playerData.data.bt.pvp_div2.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.bt.pvp_div3.dmg, '')}">{{playerData.data.bt.pvp_div3.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.bt.rank_solo.dmg, '')}">{{playerData.data.bt.rank_solo.dmg}}</p>
+                    <p class="" :style="{color: getPRColorFromUtil(playerData.bt.rank_solo.pr)}">{{getPersonalRateData(playerData.bt.rank_solo.pr).name}} {{playerData.bt.rank_solo.pr}}</p>
                   </div>
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.bt.pvp_solo.fr)}">{{playerData.data.bt.pvp_solo.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.bt.pvp_solo.wr)}">{{playerData.bt.pvp_solo.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.bt.pvp_div2.fr)}">{{playerData.data.bt.pvp_div2.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.bt.pvp_div2.wr)}">{{playerData.bt.pvp_div2.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.bt.pvp_div3.fr)}">{{playerData.data.bt.pvp_div3.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.bt.pvp_div3.wr)}">{{playerData.bt.pvp_div3.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.bt.rank_solo.fr)}">{{playerData.data.bt.rank_solo.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.bt.rank_solo.wr)}">{{playerData.bt.rank_solo.wr}}%</p>
                   </div>
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.bt.pvp_solo.exp)}">{{playerData.data.bt.pvp_solo.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.bt.pvp_solo.dmg, '')}">{{playerData.bt.pvp_solo.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.bt.pvp_div2.exp)}">{{playerData.data.bt.pvp_div2.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.bt.pvp_div2.dmg, '')}">{{playerData.bt.pvp_div2.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.bt.pvp_div3.exp)}">{{playerData.data.bt.pvp_div3.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.bt.pvp_div3.dmg, '')}">{{playerData.bt.pvp_div3.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.bt.rank_solo.exp)}">{{playerData.data.bt.rank_solo.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.bt.rank_solo.dmg, '')}">{{playerData.bt.rank_solo.dmg}}</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.bt.pvp_solo.fr)}">{{playerData.bt.pvp_solo.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.bt.pvp_div2.fr)}">{{playerData.bt.pvp_div2.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.bt.pvp_div3.fr)}">{{playerData.bt.pvp_div3.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.bt.rank_solo.fr)}">{{playerData.bt.rank_solo.fr}}</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.bt.pvp_solo.exp)}">{{playerData.bt.pvp_solo.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.bt.pvp_div2.exp)}">{{playerData.bt.pvp_div2.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.bt.pvp_div3.exp)}">{{playerData.bt.pvp_div3.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.bt.rank_solo.exp)}">{{playerData.bt.rank_solo.exp}}</p>
                   </div>
                 </div>
               </div>
@@ -285,104 +285,104 @@ function getFRColorFromUtil(fr: number) {
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{playerData.data.st.AirCarrier.blt}}</p>
+                    <p class="">{{playerData.st.AirCarrier.blt}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{playerData.data.st.Battleship.blt}}</p>
+                    <p class="">{{playerData.st.Battleship.blt}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{playerData.data.st.Cruiser.blt}}</p>
+                    <p class="">{{playerData.st.Cruiser.blt}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{playerData.data.st.Destroyer.blt}}</p>
+                    <p class="">{{playerData.st.Destroyer.blt}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="">{{playerData.data.st.Submarine.blt}}</p>
-                  </div>
-                </div>
-                <div>
-                  <div class="text-center text-gray-400">
-                    <p  class="" :style="{color: getPRColorFromUtil(playerData.data.st.AirCarrier.pr)}">{{getPersonalRateData(playerData.data.st.AirCarrier.pr).name}} {{playerData.data.st.AirCarrier.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p  class="" :style="{color: getPRColorFromUtil(playerData.data.st.Battleship.pr)}">{{getPersonalRateData(playerData.data.st.Battleship.pr).name}} {{playerData.data.st.Battleship.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p  class="" :style="{color: getPRColorFromUtil(playerData.data.st.Cruiser.pr)}">{{getPersonalRateData(playerData.data.st.Cruiser.pr).name}} {{playerData.data.st.Cruiser.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p  class="" :style="{color: getPRColorFromUtil(playerData.data.st.Destroyer.pr)}">{{getPersonalRateData(playerData.data.st.Destroyer.pr).name}} {{playerData.data.st.Destroyer.pr}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p  class="" :style="{color: getPRColorFromUtil(playerData.data.st.Submarine.pr)}">{{getPersonalRateData(playerData.data.st.Submarine.pr).name}} {{playerData.data.st.Submarine.pr}}</p>
+                    <p class="">{{playerData.st.Submarine.blt}}</p>
                   </div>
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.st.AirCarrier.wr)}">{{playerData.data.st.AirCarrier.wr}}%</p>
+                    <p  class="" :style="{color: getPRColorFromUtil(playerData.st.AirCarrier.pr)}">{{getPersonalRateData(playerData.st.AirCarrier.pr).name}} {{playerData.st.AirCarrier.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.st.Battleship.wr)}">{{playerData.data.st.Battleship.wr}}%</p>
+                    <p  class="" :style="{color: getPRColorFromUtil(playerData.st.Battleship.pr)}">{{getPersonalRateData(playerData.st.Battleship.pr).name}} {{playerData.st.Battleship.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.st.Cruiser.wr)}">{{playerData.data.st.Cruiser.wr}}%</p>
+                    <p  class="" :style="{color: getPRColorFromUtil(playerData.st.Cruiser.pr)}">{{getPersonalRateData(playerData.st.Cruiser.pr).name}} {{playerData.st.Cruiser.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.st.Destroyer.wr)}">{{playerData.data.st.Destroyer.wr}}%</p>
+                    <p  class="" :style="{color: getPRColorFromUtil(playerData.st.Destroyer.pr)}">{{getPersonalRateData(playerData.st.Destroyer.pr).name}} {{playerData.st.Destroyer.pr}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getWRColorFromUtil(playerData.data.st.Submarine.wr)}">{{playerData.data.st.Submarine.wr}}%</p>
-                  </div>
-                </div>
-                <div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.st.AirCarrier.dmg, 'AirCarrier')}">{{playerData.data.st.AirCarrier.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.st.Battleship.dmg, 'Battleship')}">{{playerData.data.st.Battleship.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.st.Cruiser.dmg, 'Cruiser')}">{{playerData.data.st.Cruiser.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.st.Destroyer.dmg, 'Destroyer')}">{{playerData.data.st.Destroyer.dmg}}</p>
-                  </div>
-                  <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getDMGColorFromUtil(playerData.data.st.Submarine.dmg, 'Submarine')}">{{playerData.data.st.Submarine.dmg}}</p>
+                    <p  class="" :style="{color: getPRColorFromUtil(playerData.st.Submarine.pr)}">{{getPersonalRateData(playerData.st.Submarine.pr).name}} {{playerData.st.Submarine.pr}}</p>
                   </div>
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.st.AirCarrier.fr)}">{{playerData.data.st.AirCarrier.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.st.AirCarrier.wr)}">{{playerData.st.AirCarrier.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.st.Battleship.fr)}">{{playerData.data.st.Battleship.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.st.Battleship.wr)}">{{playerData.st.Battleship.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.st.Cruiser.fr)}">{{playerData.data.st.Cruiser.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.st.Cruiser.wr)}">{{playerData.st.Cruiser.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.st.Destroyer.fr)}">{{playerData.data.st.Destroyer.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.st.Destroyer.wr)}">{{playerData.st.Destroyer.wr}}%</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getFRColorFromUtil(playerData.data.st.Submarine.fr)}">{{playerData.data.st.Submarine.fr}}</p>
+                    <p class="" :style="{color: getWRColorFromUtil(playerData.st.Submarine.wr)}">{{playerData.st.Submarine.wr}}%</p>
                   </div>
                 </div>
                 <div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.st.AirCarrier.exp)}">{{playerData.data.st.AirCarrier.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.st.AirCarrier.dmg, 'AirCarrier')}">{{playerData.st.AirCarrier.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.st.Battleship.exp)}">{{playerData.data.st.Battleship.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.st.Battleship.dmg, 'Battleship')}">{{playerData.st.Battleship.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.st.Cruiser.exp)}">{{playerData.data.st.Cruiser.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.st.Cruiser.dmg, 'Cruiser')}">{{playerData.st.Cruiser.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.st.Destroyer.exp)}">{{playerData.data.st.Destroyer.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.st.Destroyer.dmg, 'Destroyer')}">{{playerData.st.Destroyer.dmg}}</p>
                   </div>
                   <div class="text-center text-gray-400">
-                    <p class="" :style="{color: getExpColorFromUtil(playerData.data.st.Submarine.exp)}">{{playerData.data.st.Submarine.exp}}</p>
+                    <p class="" :style="{color: getDMGColorFromUtil(playerData.st.Submarine.dmg, 'Submarine')}">{{playerData.st.Submarine.dmg}}</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.st.AirCarrier.fr)}">{{playerData.st.AirCarrier.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.st.Battleship.fr)}">{{playerData.st.Battleship.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.st.Cruiser.fr)}">{{playerData.st.Cruiser.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.st.Destroyer.fr)}">{{playerData.st.Destroyer.fr}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getFRColorFromUtil(playerData.st.Submarine.fr)}">{{playerData.st.Submarine.fr}}</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.st.AirCarrier.exp)}">{{playerData.st.AirCarrier.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.st.Battleship.exp)}">{{playerData.st.Battleship.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.st.Cruiser.exp)}">{{playerData.st.Cruiser.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.st.Destroyer.exp)}">{{playerData.st.Destroyer.exp}}</p>
+                  </div>
+                  <div class="text-center text-gray-400">
+                    <p class="" :style="{color: getExpColorFromUtil(playerData.st.Submarine.exp)}">{{playerData.st.Submarine.exp}}</p>
                   </div>
                 </div>
               </div>

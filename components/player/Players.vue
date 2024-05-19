@@ -8,7 +8,7 @@ import {useIntervalFn} from "@vueuse/core";
 import {getLatestBattleHistory} from "~/composables/store/battle_history";
 import {sortShip} from "#imports";
 import parseDatetime from "~/utils/parse.datetime";
-import {defaultBattleData, fetchBattleData} from "~/composables/requests/kokomi";
+import {defaultBattleDataItem, fetchBattleData} from "~/composables/requests/kokomi";
 import type {BattleDataResponse, BattleDataRequest} from "~/composables/requests/kokomi";
 import TeammateCardSimple from "~/components/player/TeammateCardSimple.vue";
 import EnemyCardSimple from "~/components/player/EnemyCardSimple.vue";
@@ -31,23 +31,25 @@ const isReady = ref(false)
 const duration = ref(0)
 const battleDataResp = ref(null as unknown as BattleDataResponse)
 
-// 判断该条目是否为同一条目 避免重复请求
-const timestamp = ref(0)
-const teammateServer = ref('')
-const enemyServer = ref('')
+const result = ref<BattleHistory>(null as unknown as BattleHistory)
 
-function SortByPr() {
+// 判断该条目是否为同一条目 避免重复请求
+const lastTimestamp = ref(0)
+const lastTeammateServer = ref('')
+const lastEnemyServer = ref('')
+
+function SortPlayers() {
   if (isSortedByPr.value) {
     let tempTeammates = teammates.value.map(item => {
       return {
         ...item,
-        ship_profile: battleDataResp.value.data.battle_data.find(i => i.id === item.id)?.ship_profile ?? defaultBattleData.ship_profile,
+        ship_profile: battleDataResp.value.battle_data.find(i => i.id === item.id)?.ship_profile ?? defaultBattleDataItem.ship_profile,
       }
     })
     let tempEnemies = enemies.value.map(item => {
       return {
         ...item,
-        ship_profile: battleDataResp.value.data.battle_data.find(i => i.id === item.id)?.ship_profile ?? defaultBattleData.ship_profile,
+        ship_profile: battleDataResp.value.battle_data.find(i => i.id === item.id)?.ship_profile ?? defaultBattleDataItem.ship_profile,
       }
     })
     teammates.value = tempTeammates.sort((a, b) => {
@@ -63,7 +65,7 @@ function SortByPr() {
 }
 
 watch(isSortedByPr, () => {
-  SortByPr()
+  SortPlayers()
   saveKV('isSortedByPr', isSortedByPr.value.toString())
 })
 
@@ -75,12 +77,15 @@ watch(isHiddenStats, () => {
   saveKV('isHiddenStats', isHiddenStats.value.toString())
 })
 
-useIntervalFn(async () => {
-  let result = await getLatestBattleHistory()
-  if (result) {
-    if (result.timestamp === timestamp.value && result.teammate_server === teammateServer.value && result.enemy_server === enemyServer.value) {
-      return
-    }
+watch(result, async (value) => {
+  if (value) {
+    await updateInfo(value)
+  }
+})
+
+async function updateInfo(result: BattleHistory) {
+  pause()
+
     screenInfo.value = '正在解析数据，请稍后'
     isReady.value = false
 
@@ -119,6 +124,10 @@ useIntervalFn(async () => {
     gameInfo.value = gameData
     battleHistory.value = result
 
+    lastTimestamp.value = result.timestamp
+    lastTeammateServer.value = result.teammate_server
+    lastEnemyServer.value = result.enemy_server
+
     let battleType = 'pvp'
     if (gameData.matchGroup.toUpperCase() === 'RANKED') {
       battleType = 'rank'
@@ -146,25 +155,37 @@ useIntervalFn(async () => {
     }
     screenInfo.value = '正在请求数据，请稍后'
     await fetchBattleData(params).then((resp) => {
-       battleDataResp.value = resp
-       SortByPr()
-       isReady.value = true
+      battleDataResp.value = resp
+      SortPlayers()
+      isReady.value = true
     }).catch((err) => {
       toast.add({
-        title: "获取数据失败：" + err.message,
+        title: "获取数据失败：" + err,
       })
-      screenInfo.value = '获取数据失败' + err.message
+      screenInfo.value = '获取数据失败：' + err
       console.log(err)
-      timestamp.value = 0
+      lastTimestamp.value = 0
     })
 
-    timestamp.value = result.timestamp
-    teammateServer.value = result.teammate_server
-    enemyServer.value = result.enemy_server
+  resume()
+}
 
-    console.log(enemies.value)
-    console.log(teammates.value)
+onMounted(async () => {
+  const r = await getLatestBattleHistory()
+  if (r) {
+    result.value = r
+  } else {
+    screenInfo.value = '没有数据哦~请这位窝批，启动！'
   }
+})
+
+const {pause, resume} = useIntervalFn(async () => {
+  const r = await getLatestBattleHistory()
+  if (!r) {return}
+  if (r.timestamp === lastTimestamp.value && r.teammate_server === lastTeammateServer.value && r.enemy_server === lastEnemyServer.value) {
+    return
+  }
+  result.value = r
 }, 5000)
 useIntervalFn(async () => {
   if (gameInfo.value) {
@@ -184,7 +205,7 @@ useIntervalFn(async () => {
               class="w-3/5 rounded-lg shadow-sm p-5 border-dashed border border-blue-500 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-0 text-center">
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
               <div class="text-center">
-                <div class="stat-value text-3xl">{{ screenInfo }}</div>
+                <div class="text-3xl">{{ screenInfo }}</div>
                 <span class="loading loading-infinity loading-lg"></span>
               </div>
             </div>
@@ -227,11 +248,11 @@ useIntervalFn(async () => {
               <TeammateCard v-if="isDetail"
                   :playerInfo="item"
                   :server="battleHistory.teammate_server"
-                  :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
+                  :battle-data="battleDataResp.battle_data.find(i => i.id === item.id)??defaultBattleDataItem"/>
               <TeammateCardSimple v-if="!isDetail"
                   :playerInfo="item"
                   :server="battleHistory.teammate_server"
-                  :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
+                  :battle-data="battleDataResp.battle_data.find(i => i.id === item.id)??defaultBattleDataItem"/>
             </li>
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
@@ -247,12 +268,12 @@ useIntervalFn(async () => {
               <EnemyCard v-if="isDetail"
                   :playerInfo="item"
                   :server="battleHistory.enemy_server"
-                  :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"
+                  :battle-data="battleDataResp.battle_data.find(i => i.id === item.id)??defaultBattleDataItem"
               />
               <EnemyCardSimple v-if="!isDetail"
                   :playerInfo="item"
                   :server="battleHistory.enemy_server"
-                  :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
+                  :battle-data="battleDataResp.battle_data.find(i => i.id === item.id)??defaultBattleDataItem"/>
             </li>
             <li v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">

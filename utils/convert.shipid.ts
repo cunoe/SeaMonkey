@@ -17,21 +17,23 @@ export default async function convertShipid(id: string): Promise<ShipInfo> {
             }
         }
         const shipInfoResp = await fetchShipInfo(id)
-        if (shipInfoResp === null) {
+
+        console.log(shipInfoResp)
+        if (shipInfoResp === undefined) {
             return defaultShipInfo
         }else {
-            if (shipInfoResp.data.nameCn === "未知战舰") {
+            if (shipInfoResp.nameCn === "未知战舰") {
                 return defaultShipInfo
             }
 
             let cacheShipInfo = {
-                tier: shipInfoResp.data.level,
-                type: shipInfoResp.data.shipType,
-                nation: shipInfoResp.data.country.toLowerCase(),
-                name: shipInfoResp.data.nameEnglish,
+                tier: shipInfoResp.level,
+                type: shipInfoResp.shipType,
+                nation: shipInfoResp.country.toLowerCase(),
+                name: shipInfoResp.nameEnglish,
                 ship_name: {
-                    zh_sg: shipInfoResp.data.nameCn,
-                    en: shipInfoResp.data.nameEnglish,
+                    zh_sg: shipInfoResp.nameCn,
+                    en: shipInfoResp.nameEnglish,
                     nick: [],
                     other: [],
                 }

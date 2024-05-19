@@ -15,7 +15,7 @@ import convertServerToLocale from "../../utils/convert.server";
 import {
   type BattleDataRequest,
   type BattleDataResponse,
-  defaultBattleData,
+  defaultBattleDataItem,
   fetchBattleData
 } from "~/composables/requests/kokomi";
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
@@ -72,7 +72,7 @@ const chartOptions: Ref<any> = ref({
   }
 })
 
-onMounted(async () => {
+async function getInfo() {
   let result = await getBattleHistoryById(props.battleId)
   if (result) {
     battleHistory.value = result
@@ -127,7 +127,7 @@ onMounted(async () => {
           id: item.id,
           ship_id: item.shipId,
           name: item.name,
-          damage: (battleDataResp.value.data.battle_data.find(i => i.id === item.id)??defaultBattleData).user_profile.dmg,
+          damage: (battleDataResp.value.battle_data.find(i => i.id === item.id)??defaultBattleDataItem).user_profile.dmg,
         }
       }).sort((a,b) => b.damage - a.damage)
 
@@ -136,7 +136,7 @@ onMounted(async () => {
           id: item.id,
           ship_id: item.shipId,
           name: item.name,
-          exp: (battleDataResp.value.data.battle_data.find(i => i.id === item.id)??defaultBattleData).user_profile.exp,
+          exp: (battleDataResp.value.battle_data.find(i => i.id === item.id)??defaultBattleDataItem).user_profile.exp,
         }
       }).sort((a,b) => b.exp - a.exp)
 
@@ -148,18 +148,30 @@ onMounted(async () => {
       isReady.value = true
     }).catch((err) => {
       toast.add({
-        title: "获取数据失败：" + err.message,
+        title: "获取数据失败：" + err,
       })
-      screenInfo.value = '获取数据失败：' + err.message
+      screenInfo.value = '获取数据失败：' + err + '将在10秒后重试'
       console.log(err)
+      resume()
     })
   }
-  useIntervalFn(async () => {
-    if (gameInfo.value) {
-      duration.value = ((new Date).getTime() - parseDatetime(gameInfo.value.dateTime).getTime())/1000
-    }
-  }, 1000)
+}
+
+onMounted(async () => {
+  pause()
+  await getInfo()
 })
+
+const { pause, resume } = useIntervalFn(async () => {
+  pause()
+  if (isReady.value) {return}
+  await getInfo()
+}, 10000)
+useIntervalFn(async () => {
+  if (gameInfo.value) {
+    duration.value = ((new Date).getTime() - parseDatetime(gameInfo.value.dateTime).getTime())/1000
+  }
+}, 1000)
 </script>
 
 <template>
@@ -172,7 +184,7 @@ onMounted(async () => {
               class="w-3/5 rounded-lg shadow-sm p-5 border-dashed border border-blue-500 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-0 text-center">
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
               <div class="text-center">
-                <div class="stat-value text-3xl">{{screenInfo}}</div>
+                <div class="text-3xl">{{screenInfo}}</div>
                 <span class="loading loading-infinity loading-lg"></span>
               </div>
             </div>
@@ -215,7 +227,7 @@ onMounted(async () => {
         <div class="columns-2 p-4 gap-2">
           <div>
             <div v-for="(item, index) in teammates" :key="index" class="rounded-lg p-1 flex justify-end">
-              <TeammateCard :playerInfo="item" :server="battleHistory.teammate_server" :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData"/>
+              <TeammateCard :playerInfo="item" :server="battleHistory.teammate_server" :battle-data="battleDataResp.battle_data.find(i => i.id === item.id)??defaultBattleDataItem"/>
             </div>
             <template v-if="teammates.length < maxItem">
               <template v-for="i in maxItem - teammates.length">
@@ -227,7 +239,7 @@ onMounted(async () => {
           </div>
           <div>
             <div v-for="(item, index) in enemies" :key="index" class="rounded-lg p-1 flex justify-start">
-              <EnemyCard :playerInfo="item" :server="battleHistory.enemy_server" :battle-data="battleDataResp.data.battle_data.find(i => i.id === item.id)??defaultBattleData" />
+              <EnemyCard :playerInfo="item" :server="battleHistory.enemy_server" :battle-data="battleDataResp.battle_data.find(i => i.id === item.id)??defaultBattleDataItem" />
             </div>
             <template v-if="enemies.length < maxItem">
               <template v-for="i in maxItem - enemies.length">
