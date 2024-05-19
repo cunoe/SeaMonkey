@@ -2,46 +2,52 @@ import {fetchShipInfo} from "~/composables/requests/yuyuko";
 import {getKV, saveKV, deleteKV} from "~/composables/store/kv";
 
 export default async function convertShipid(id: string): Promise<ShipInfo> {
-    const shipInfo = shipMap[id];
-    if (shipInfo) {
-        return shipInfo;
-    } else {
-        const cacheShipInfo = await getKV(`ship_info_${id}`)
-        if (cacheShipInfo) {
-            let info = JSON.parse(cacheShipInfo) as ShipInfo
-            if (info.ship_name.zh_sg === "未知战舰") {
-                await deleteKV(`ship_info_${id}`)
-                return defaultShipInfo
-            } else {
-                return info
-            }
-        }
-        const shipInfoResp = await fetchShipInfo(id)
-
-        console.log(shipInfoResp)
-        if (shipInfoResp === undefined) {
-            return defaultShipInfo
-        }else {
-            if (shipInfoResp.nameCn === "未知战舰") {
-                return defaultShipInfo
-            }
-
-            let cacheShipInfo = {
-                tier: shipInfoResp.level,
-                type: shipInfoResp.shipType,
-                nation: shipInfoResp.country.toLowerCase(),
-                name: shipInfoResp.nameEnglish,
-                ship_name: {
-                    zh_sg: shipInfoResp.nameCn,
-                    en: shipInfoResp.nameEnglish,
-                    nick: [],
-                    other: [],
+    return new Promise(async (resolve, reject) => {
+        const shipInfo = shipMap[id];
+        if (shipInfo) {
+            resolve(shipInfo);
+        } else {
+            const cacheShipInfo = await getKV(`ship_info_${id}`)
+            if (cacheShipInfo) {
+                let info = JSON.parse(cacheShipInfo) as ShipInfo
+                if (info.ship_name.zh_sg === "未知战舰") {
+                    await deleteKV(`ship_info_${id}`)
+                    resolve(defaultShipInfo)
+                } else {
+                    resolve(info)
                 }
             }
-            await saveKV(`ship_info_${id}`, JSON.stringify(cacheShipInfo))
-            return cacheShipInfo
+            // const shipInfoResp = await fetchShipInfo(id)
+
+            await fetchShipInfo(id).then(async (shipInfoResp) => {
+                if (shipInfoResp === undefined) {
+                    resolve(defaultShipInfo)
+                }else {
+                    if (shipInfoResp.nameCn === "未知战舰") {
+                        resolve(defaultShipInfo)
+                    }
+
+                    let cacheShipInfo = {
+                        tier: shipInfoResp.level,
+                        type: shipInfoResp.shipType,
+                        nation: shipInfoResp.country.toLowerCase(),
+                        name: shipInfoResp.nameEnglish,
+                        ship_name: {
+                            zh_sg: shipInfoResp.nameCn,
+                            en: shipInfoResp.nameEnglish,
+                            nick: [],
+                            other: [],
+                        }
+                    }
+                    await saveKV(`ship_info_${id}`, JSON.stringify(cacheShipInfo))
+                    resolve(cacheShipInfo)
+                }
+            }).catch((err) => {
+                console.log(err)
+                resolve(defaultShipInfo)
+            })
         }
-    }
+    })
 }
 
 export const defaultShipInfo: ShipInfo = {

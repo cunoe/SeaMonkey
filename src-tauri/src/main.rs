@@ -1,33 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use regex::Regex;
 use std::fs;
 use std::path::Path;
-
-use regex::Regex;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
-// fn main() {
-//     
-//     tauri::Builder::default()
-//         .plugin(tauri_plugin_sql::Builder::default()
-//             .add_migrations("sqlite:data.db", migrations)
-//             .build())
-//         .invoke_handler(tauri::generate_handler![get_replays_temp_info, get_selected_realm])
-//         .run(tauri::generate_context!())
-//         .expect("error while running tauri application");
-// }
-
-use tauri::{utils::config::AppUrl, window::WindowBuilder, WindowUrl};
-
 fn main() {
-    let port = portpicker::pick_unused_port().expect("failed to find unused port");
-
-    let mut context = tauri::generate_context!();
-    let url = format!("http://localhost:{}", port).parse().unwrap();
-    let window_url = WindowUrl::External(url);
-    // rewrite the config so the IPC is enabled on this URL
-    context.config_mut().build.dist_dir = AppUrl::Url(window_url.clone());
+    // let port: u16 = 3000;
 
     let migrations = vec![
         Migration {
@@ -45,21 +25,31 @@ fn main() {
     ];
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_sql::Builder::default()
-            .add_migrations("sqlite:data.db", migrations)
-            .build())
-        .invoke_handler(tauri::generate_handler![get_replays_temp_info, get_selected_realm])
-        .plugin(tauri_plugin_localhost::Builder::new(port).build())
-        .setup(move |app| {
-            WindowBuilder::new(app, "main".to_string(), window_url)
-                .title("SeaMonkey - 谁是海猴？")
-                .fullscreen(false)
-                .resizable(true)
-                .min_inner_size(1440f64, 800f64)
-                .build()?;
-            Ok(())
-        })
-        .run(context)
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
+        //         .plugin(tauri_plugin_localhost::Builder::new(port).build())
+        //         .setup(move |app| {
+        //             let url = format!("http://localhost:{}", port).parse().unwrap();
+        //             WebviewWindowBuilder::new(app, "main".to_string(), window_url)
+        //                 .title("SeaMonkey - 谁是海猴？")
+        //                 .fullscreen(false)
+        //                 .resizable(true)
+        //                 .min_inner_size(1440f64, 800f64)
+        //                 .build()?;
+        //             Ok(())
+        //         })
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations("sqlite:data.db", migrations)
+                .build(),
+        )
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![
+            get_replays_temp_info,
+            get_selected_realm
+        ])
+        .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
@@ -82,7 +72,7 @@ fn get_replays_temp_info(game_dir: String) -> Result<String, String> {
                     // 成功读取非空文件
                     Ok(text) // Return the content of the file
                 }
-            },
+            }
             Err(_) => {
                 // 文件不存在或无法读取
                 Err("1001".to_string()) // Return Code 1001 = replays directory exists but tempArenaInfo.json not found or empty
@@ -103,10 +93,10 @@ fn get_selected_realm(game_dir: String) -> Result<String, String> {
     // Construct the path to the clientrunner.log file
     let game_dir = Path::new(&game_dir);
     let profile_dir = game_dir.join("profile");
-    
+
     if does_folder_exist(&profile_dir) {
         let clientrunner_log_path = profile_dir.join("clientrunner.log");
-        match fs::read_to_string(&clientrunner_log_path) { 
+        match fs::read_to_string(&clientrunner_log_path) {
             Ok(text) => {
                 // Compile the regex
                 let re = match Regex::new(r"Selected realm:\s*(\S+)") {
@@ -114,16 +104,16 @@ fn get_selected_realm(game_dir: String) -> Result<String, String> {
                     Err(_) => return Err("1003".to_string()),
                 };
                 // Find matches
-                    if let Some(caps) = re.captures_iter(&text).last() {
-                        if let Some(matched) = caps.get(1) {
-                            Ok(matched.as_str().to_string())  // Return the last matched group
-                        } else {
-                            Err("1000".to_string())  // Return Code 1000 = selected realm not found
-                        }
+                if let Some(caps) = re.captures_iter(&text).last() {
+                    if let Some(matched) = caps.get(1) {
+                        Ok(matched.as_str().to_string()) // Return the last matched group
                     } else {
-                        Err("1000".to_string())  // Return Code 1000 = selected realm not found
+                        Err("1000".to_string()) // Return Code 1000 = selected realm not found
                     }
-            },
+                } else {
+                    Err("1000".to_string()) // Return Code 1000 = selected realm not found
+                }
+            }
             Err(_) => {
                 return Err("1001".to_string()); // Return Code 1001 = profile directory exists but clientrunner.log not found or empty
             }

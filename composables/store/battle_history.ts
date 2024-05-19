@@ -1,3 +1,5 @@
+import Database from "@tauri-apps/plugin-sql";
+
 export interface BattleHistory {
     id: number;
     timestamp: number;
@@ -18,7 +20,6 @@ export interface BattleHistory {
     tire: number;
     raw_data: string;
 }
-import Database from "tauri-plugin-sql-api";
 
 export async function saveBattleHistory(battleHistory: {
     map_display_name: string;

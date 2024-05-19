@@ -1,8 +1,8 @@
+import Database from "@tauri-apps/plugin-sql";
 export interface KVData {
   key: string;
   value: string;
 }
-import Database from "tauri-plugin-sql-api";
 
 export async function getKV(key: string): Promise<string> {
   const db = await Database.load("sqlite:data.db");

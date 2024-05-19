@@ -3,82 +3,79 @@
   "build": {
     "beforeBuildCommand": "pnpm generate",
     "beforeDevCommand": "pnpm dev",
-    "devPath": "http://localhost:3000",
-    "distDir": "../dist",
-    "withGlobalTauri": true
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:3000"
   },
-  "package": {
-    "productName": "sea-monkey",
-    "version": "0.0.13"
-  },
-  "tauri": {
-    "allowlist": {
-      "dialog": {
-        "open": true
-      },
-      "shell": {
-        "open": true
-      },
-      "path": {
-        "all": true
-      },
-      "fs": {
-        "readFile": true,
-        "readDir": true,
-        "exists": true,
-        "createDir": true,
-        "scope": ["$APPDATA/*", "$PICTURE/*"]
-      },
-      "protocol": {
-        "asset": true,
-        "assetScope": [
-          "$PICTURE/**"
-        ]
+  "bundle": {
+    "active": true,
+    "category": "Utility",
+    "copyright": "cunoe",
+    "targets": [
+      "nsis",
+      "updater"
+    ],
+    "externalBin": [],
+    "icon": [
+      "icons/sea-monkey.png",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "nsis": {
+        "languages": [
+          "SimpChinese"
+        ],
+        "displayLanguageSelector": true
       }
     },
-    "bundle": {
-      "active": true,
-      "category": "Utility",
-      "copyright": "cunoe",
+    "longDescription": "一款战舰世界数据辅助工具",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "resources": [],
+    "shortDescription": "",
+    "linux": {
       "deb": {
         "depends": []
-      },
-      "externalBin": [],
-      "icon": [
-        "icons/sea-monkey.png",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.cunoe.sea-monkey",
-      "longDescription": "一款战舰世界数据辅助工具",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": ["nsis", "updater"],
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": "",
-        "nsis": {
-          "languages": ["SimpChinese"],
-          "displayLanguageSelector": true
-        }
       }
-    },
-    "security": {
-      "dangerousDisableAssetCspModification": true
-    },
+    }
+  },
+  "productName": "sea-monkey",
+  "version": "0.0.13",
+  "identifier": "com.cunoe.sea-monkey",
+  "plugins": {
     "updater": {
-      "active": true,
-      "endpoints": ["https://github.com/cunoe/SeaMonkey/releases/download/v0.0.14/latest.json"],
-      "dialog": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMyMTU3MDAwQzZCMzI5NkQKUldSdEtiUEdBSEFWTXFQZ0RNWWJPRlpSaUFJR3loUjVKWmtGV0c0Um1mR3Z6M0pHb2hFRWViY00K"
-    },
-    "windows": []
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDMyMTU3MDAwQzZCMzI5NkQKUldSdEtiUEdBSEFWTXFQZ0RNWWJPRlpSaUFJR3loUjVKWmtGV0c0Um1mR3Z6M0pHb2hFRWViY00K",
+      "endpoints": [
+        "https://github.com/cunoe/SeaMonkey/releases/download/v0.0.14/latest.json"
+      ]
+    }
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "SeaMonkey - 谁是海猴？",
+        "fullscreen": false,
+        "resizable": true,
+        "minWidth": 1440,
+        "minHeight": 800
+      }
+    ],
+    "security": {
+      "dangerousDisableAssetCspModification": true,
+      "assetProtocol": {
+        "scope": [
+          "$PICTURE/**"
+        ],
+        "enable": true
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { useIntervalFn } from '@vueuse/core'
 import { getKV } from "~/composables/store/kv";
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {getKV, saveKV} from "~/composables/store/kv";
-import { open } from '@tauri-apps/api/dialog';
+import { open } from '@tauri-apps/plugin-dialog';
 import { desktopDir } from '@tauri-apps/api/path';
 
 async function selectDir() {

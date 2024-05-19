@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {getKV, saveKV} from "~/composables/store/kv";
-import { open } from '@tauri-apps/api/dialog';
-import {desktopDir, pictureDir} from '@tauri-apps/api/path';
+import { open } from '@tauri-apps/plugin-dialog';
+import {desktopDir, pictureDir, join} from '@tauri-apps/api/path';
 import {useIntervalFn} from "@vueuse/core";
-import {BaseDirectory, createDir, exists, readDir} from "@tauri-apps/api/fs";
-import {convertFileSrc} from "@tauri-apps/api/tauri";
+import {BaseDirectory, mkdir, exists, readDir} from "@tauri-apps/plugin-fs";
+import { convertFileSrc } from '@tauri-apps/api/core';
 
 async function selectDir() {
   const selected = await open({
@@ -147,7 +147,10 @@ onBeforeMount(async () => {
   }
   clanEnemyServerSelected.value = clanEnemyServer[currentClanEnemyServerIndex.value]
 
-  backgroundDir.value = await pictureDir() + "\SeaMonkeyBackground"
+  const picture = await pictureDir()
+  backgroundDir.value = await join(picture, "SeaMonkeyBackground")
+
+  await getBG()
 })
 
 const imagesListToSelect = ref<any[]>([
@@ -171,42 +174,52 @@ watch(imageSelected, () => {
   lastSelected.value = imageSelected.value.id
 })
 
-useIntervalFn(async () => {
+async function getBG() {
   const bgn = await getKV('backgroundImage')
+  const picture = await pictureDir()
   exists('SeaMonkeyBackground', {
-    dir: BaseDirectory.Picture,
+    baseDir: BaseDirectory.Picture,
   }).then(async (result) => {
     if (!result) {
       console.log('No background images found in cache')
-      await createDir('SeaMonkeyBackground', {
-        dir: BaseDirectory.Picture,
+      await mkdir('SeaMonkeyBackground', {
+        baseDir: BaseDirectory.Picture,
         recursive: true
       })
     } else {
       const images_in_cache = await readDir(
           'SeaMonkeyBackground',
           {
-            dir: BaseDirectory.Picture,
-            recursive: false
+            baseDir: BaseDirectory.Picture
           }
       );
       imagesListToSelect.value.splice(1)
       for (const entry of images_in_cache) {
-        if (bgn === convertFileSrc(entry.path)) {
+        if (!entry.isFile) {
+          continue
+        }
+        let p = convertFileSrc(await join(picture, 'SeaMonkeyBackground', entry.name))
+        // entry.name = path.basename(entry.path)
+
+        if (bgn === p) {
           imageSelected.value = {
-            id: convertFileSrc(entry.path),
-            label: entry.name ? entry.name : entry.path
+            id: p,
+            label: entry.name ? entry.name : p
           }
           continue
         }
         imagesListToSelect.value.push({
-          id: convertFileSrc(entry.path),
-          label: entry.name ? entry.name : entry.path
+          id: p,
+          label: entry.name ? entry.name : p
         });
       }
     }
   })
-}, 1000)
+}
+
+useIntervalFn(async () => {
+  await getBG()
+}, 10000)
 </script>
 
 <template>
